@@ -1,0 +1,52 @@
+DATABASE
+Patients => patient_id, name, surname, age, idnumber, gender, phoneNumber, address, nokName, nokPhoneNumber, MaritalStatus, SpouseName, SpousePhonenumber, email*
+
+Staff => Staffid, name, surname, title, age, idnumber, gender, phoneNumber, address, nokName, nokPhoneNumber, email,* 
+
+Users => userId, email, password, role, staffId,*
+
+Roles => roleid, RValue*
+
+Appointments => appointmentId, description, appointmentStatus, date, Log, patientId, staffId, appointmentCategory
+
+//Deliveries => 
+
+Medications
+
+//Newborns => Dob, Cname
+
+MedicalHistory =>
+
+
+BACKEND
+
+patients
+staff
+users
+appointments
+medicalHistory
+paymentGateway
+
+
+FRONTEND
+
+//OnBoarding
+login => {role}
+registration
+activation
+
+patient registration
+
+
+//Patient
+details
+pregnancy progress
+appointments
+medication
+
+single
+married
+divorced
+
+
+
