@@ -1,4 +1,3 @@
-// src/components/PostnatalVisits.js
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { postnatalVisits } from "../data";
 
@@ -6,6 +5,7 @@ import { postnatalVisits } from "../data";
 const avatarColors = [
   "#7f5af0", "#f6c177", "#90e0ef", "#f875aa", "#5adbb5", "#f9dc5c"
 ];
+
 function stringToColor(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -18,7 +18,6 @@ export default function PostnatalVisits() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 800);
 
   useEffect(() => {
-    // Keyboard shortcut for search
     function handler(e) {
       if ((e.key === "/" || e.key === "s") && !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) {
         e.preventDefault(); searchRef.current?.focus();
@@ -113,7 +112,7 @@ export default function PostnatalVisits() {
                       background: `linear-gradient(120deg, #fff 0%, #f6f7fb 100%)`,
                       color: "#7f5af0"
                     }} aria-label={`Patient ${visit.patient_id}`}>
-                      {visit.patient_id.slice(0,2).toUpperCase()}
+                      {typeof visit.patient_id === 'string' ? visit.patient_id.slice(0, 2).toUpperCase() : 'N/A'}
                     </span>
                     <span style={{marginLeft:8, fontWeight:600}}>{visit.patient_id}</span>
                   </td>
@@ -135,7 +134,7 @@ export default function PostnatalVisits() {
                       background: `linear-gradient(120deg, ${stringToColor(visit.staff_id)} 0%, #f6f7fb 100%)`,
                       color: "#fff"
                     }} aria-label={`Staff ${visit.staff_id}`}>
-                      {visit.staff_id.slice(0,2).toUpperCase()}
+                      {typeof visit.staff_id === 'string' ? visit.staff_id.slice(0, 2).toUpperCase() : 'N/A'}
                     </span>
                     <span style={{marginLeft:8, fontWeight:600}}>{visit.staff_id}</span>
                   </td>
@@ -175,7 +174,7 @@ export default function PostnatalVisits() {
                   background: `linear-gradient(120deg, #fff 0%, #f6f7fb 100%)`,
                   color: "#7f5af0"
                 }} aria-label={`Patient ${visit.patient_id}`}>
-                  {visit.patient_id.slice(0,2).toUpperCase()}
+                  {typeof visit.patient_id === 'string' ? visit.patient_id.slice(0, 2).toUpperCase() : 'N/A'}
                 </span>
                 <div className="card-info">
                   <div className="card-name">Visit {visit.visit_id}</div>
@@ -202,7 +201,7 @@ export default function PostnatalVisits() {
                       height: "32px",
                       fontSize: "1em"
                     }} aria-label={`Staff ${visit.staff_id}`}>
-                      {visit.staff_id.slice(0,2).toUpperCase()}
+                      {typeof visit.staff_id === 'string' ? visit.staff_id.slice(0, 2).toUpperCase() : 'N/A'}
                     </span>
                     <span style={{marginLeft:7, fontWeight:600}}>{visit.staff_id}</span>
                   </div>

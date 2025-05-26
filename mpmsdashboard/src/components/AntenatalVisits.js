@@ -1,4 +1,3 @@
-// src/components/AntenatalVisits.js
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { antenatalVisits } from "../data";
 
@@ -7,12 +6,15 @@ const avatarColors = [
   "#7f5af0", "#f6c177", "#5adbb5", "#f875aa", "#90e0ef", "#cfbaf0"
 ];
 const staffAvatars = ["👩‍⚕️","👨‍⚕️","🩺","💉","🔬","🧑‍⚕️"];
+
 function stringToColor(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
   return avatarColors[Math.abs(hash) % avatarColors.length];
 }
+
 function getStaffAvatar(id) {
+  if (typeof id !== 'string') return '❓'; // Return a default avatar if id is not a string
   return staffAvatars[Math.abs([...id].reduce((a, c) => a + c.charCodeAt(0), 0)) % staffAvatars.length];
 }
 
@@ -119,7 +121,7 @@ export default function AntenatalVisits() {
                         color: "#7f5af0"
                       }}
                       aria-label={`Patient ${visit.patient_id}`}
-                    >{visit.patient_id.slice(0,2).toUpperCase()}</span>
+                    >{typeof visit.patient_id === 'string' ? visit.patient_id.slice(0, 2).toUpperCase() : 'N/A'}</span>
                     <span style={{marginLeft:8, fontWeight:600}}>{visit.patient_id}</span>
                   </td>
                   <td>
@@ -194,7 +196,7 @@ export default function AntenatalVisits() {
                     color: "#7f5af0"
                   }}
                   aria-label={`Patient ${visit.patient_id}`}
-                >{visit.patient_id.slice(0,2).toUpperCase()}</span>
+                >{typeof visit.patient_id === 'string' ? visit.patient_id.slice(0, 2).toUpperCase() : 'N/A'}</span>
                 <div className="card-info">
                   <div className="card-name">Visit {visit.visit_id}</div>
                   <div className="card-row"><strong>Patient:</strong> {visit.patient_id}</div>

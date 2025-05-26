@@ -7,7 +7,7 @@ import {
 import './StyledNavbar.css';
 
 const navLinks = [
-  { to: '/', label: 'Patients', icon: <FaUserMd /> },
+  { to: '/patients', label: 'Patients', icon: <FaUserMd /> },
   { to: '/appointments', label: 'Appointments', icon: <FaCalendarAlt /> },
   { to: '/deliveries', label: 'Deliveries', icon: <FaBaby /> },
   { to: '/lab-tests', label: 'Lab Tests', icon: <FaFlask /> },
@@ -28,7 +28,9 @@ export default function StyledNavbar({ mode, toggleMode }) {
         <div className="sidebar-logo">
           <span>
             <FaBaby style={{ verticalAlign: 'middle', fontSize: 24, marginRight: 8 }} />
-            <strong>Maternity PMS</strong>
+             <Link to={"/"}>
+                 <strong>Maternity PMS</strong>
+              </Link>
           </span>
           <button
             className="sidebar-toggle mobile-only"

@@ -1,0 +1,104 @@
+:root {
+    --primary: #e0e5ec;
+    --primary-dark: #23272f;
+    --accent: #7f5af0;
+    --text-light: #23272f;
+    --glass: rgba(255, 255, 255, 0.28);
+    --shadow: 9px 9px 16px #b8bac0, -9px -9px 16px #fff;
+    --border-radius: 1.6rem;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    font-family: Arial, sans-serif;
+}
+
+.main-content {
+    padding: 2rem;
+    flex: 1;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    padding: 0.5rem;
+    border: 1px solid var(--accent);
+    border-radius: var(--border-radius);
+}
+
+.analytics, .patients, .notifications, .calendar-container {
+    background: var(--glass);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background-color: var(--primary);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-top: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.status-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.status-card {
+    background: var(--primary-dark);
+    color: #fff;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.status-card:last-child {
+    margin-right: 0;
+}
+
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.calendar {
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.notifications {
+    margin-top: 2rem;
+}
+
+.notification {
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-top: 1rem;
+}
+
+.notification.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.notification.warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.notification.success {
+    background-color: #d4edda;
+    color: #155724;
+}
