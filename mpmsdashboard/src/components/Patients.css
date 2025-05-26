@@ -1,0 +1,280 @@
+:root {
+  --table-bg: #f6f7fbcc;
+  --table-bg-dark: #242730bb;
+  --border: #e0e5ec;
+  --border-dark: #23272f;
+  --accent: #7f5af0;
+  --accent-light: #f6c177;
+  --shadow: 0 6px 24px 0 rgba(127,90,240,0.07);
+  --shadow-dark: 0 6px 24px 0 rgba(127,90,240,0.09);
+  --radius: 1.3rem;
+}
+
+.patients-wrap {
+  position: relative;
+  z-index: 1;
+}
+.patients-bg-anim {
+  /* animated background gradient */
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.13;
+  background: radial-gradient(circle at 83% 12%, #7f5af0 0, transparent 40%),
+              radial-gradient(circle at 10% 80%, #f6c177 0, transparent 44%),
+              linear-gradient(120deg, #e0e5ec 0%, #f6f7fb 85%, #f6c177 100%);
+  animation: patientsbgmove 12s linear infinite alternate;
+}
+[data-theme="dark"] .patients-bg-anim,
+body.dark .patients-bg-anim {
+  background: radial-gradient(circle at 83% 12%, #7f5af0 0, transparent 40%),
+              radial-gradient(circle at 10% 80%, #f6c177 0, transparent 44%),
+              linear-gradient(120deg, #23272f 0%, #282c34 100%);
+}
+@keyframes patientsbgmove {
+  0% { background-position: 0% 0%, 100% 100%, 0 0; }
+  100% { background-position: 80% 20%, 0% 100%, 100% 100%; }
+}
+
+.patients-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  z-index: 1;
+  position: relative;
+  margin-bottom: 2.2rem;
+}
+.patients-header h2 {
+  font-size: 2.1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--accent);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  text-shadow: 0 2px 12px rgba(127,90,240,0.06);
+}
+body.dark .patients-header h2 {
+  color: var(--accent-light);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--table-bg);
+  border-radius: 2rem;
+  padding: 0.2rem 1rem;
+  box-shadow: 0 2px 8px #ccc2;
+  border: 1.5px solid var(--border);
+  transition: background 0.3s, border 0.3s;
+}
+body.dark .search-bar {
+  background: var(--table-bg-dark);
+  border-color: var(--border-dark);
+  box-shadow: var(--shadow-dark);
+}
+.search-bar input {
+  border: none;
+  outline: none;
+  background: transparent;
+  margin-left: 0.7em;
+  font-size: 1.06rem;
+  color: #23272f;
+  width: 150px;
+  transition: color 0.3s;
+}
+body.dark .search-bar input {
+  color: #f6f7fb;
+}
+
+.patients-table-outer {
+  position: relative;
+  z-index: 2;
+}
+
+.patients-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  background: var(--table-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: background 0.4s;
+  margin-bottom: 1.5rem;
+  z-index: 2;
+  position: relative;
+}
+body.dark .patients-table {
+  background: var(--table-bg-dark);
+  box-shadow: var(--shadow-dark);
+}
+.patients-table th,
+.patients-table td {
+  padding: 1rem 0.8rem;
+  text-align: left;
+  font-size: 1.04rem;
+}
+.patients-table th {
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
+  border-bottom: 2px solid var(--accent);
+  letter-spacing: 1.5px;
+}
+body.dark .patients-table th {
+  color: var(--accent-light);
+  border-bottom-color: var(--accent-light);
+}
+.patients-table td {
+  border-bottom: 1px solid #d1d5e3;
+}
+body.dark .patients-table td {
+  border-bottom: 1px solid #292c37;
+}
+.patients-table tr:last-child td {
+  border-bottom: none;
+}
+
+.patients-row {
+  cursor: pointer;
+  transition: box-shadow 0.19s, transform 0.19s, background 0.23s;
+  animation: fadeinup 0.5s cubic-bezier(.4,2,.6,1) both;
+  outline: none;
+  position: relative;
+  z-index: 2;
+}
+.patients-row:focus,
+.patients-row:hover {
+  background: var(--glass);
+  box-shadow: 0 3px 14px 0 rgba(127,90,240,0.09), 0 0px 0px #fff;
+  transform: scale(1.011) translateY(-2px);
+}
+body.dark .patients-row:focus,
+body.dark .patients-row:hover {
+  background: var(--glass-dark);
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(120deg, #fff 0%, #f6f7fb 100%);
+  box-shadow: 0 2px 8px #ccc4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.12rem;
+  color: var(--accent);
+  overflow: hidden;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+body.dark .avatar {
+  background: linear-gradient(120deg, #292c37 0%, #23272f 100%);
+  color: var(--accent-light);
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 2em 0;
+  font-style: italic;
+}
+body.dark .empty {
+  color: #ccc;
+}
+
+@keyframes fadeinup {
+  from { opacity: 0; transform: translateY(22px) scale(0.98);}
+  to { opacity: 1; transform: translateY(0) scale(1);}
+}
+
+/* Responsive: Table to Cards */
+.patients-cards {
+  display: none;
+}
+
+@media (max-width: 800px) {
+  .patients-table {
+    display: none;
+  }
+  .patients-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.3rem;
+  }
+  .patients-card {
+    background: var(--table-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.1rem 1rem;
+    cursor: pointer;
+    transition: box-shadow 0.19s, transform 0.19s, background 0.23s;
+    animation: fadeinup 0.52s cubic-bezier(.4,2,.6,1) both;
+    outline: none;
+    position: relative;
+    z-index: 2;
+  }
+  body.dark .patients-card {
+    background: var(--table-bg-dark);
+    box-shadow: var(--shadow-dark);
+  }
+  .patients-card:focus,
+  .patients-card:hover {
+    background: var(--glass);
+    box-shadow: 0 3px 14px 0 rgba(127,90,240,0.09), 0 0px 0px #fff;
+    transform: scale(1.011) translateY(-2px);
+  }
+  body.dark .patients-card:focus,
+  body.dark .patients-card:hover {
+    background: var(--glass-dark);
+  }
+  .avatar {
+    width: 48px;
+    height: 48px;
+    margin-right: 1em;
+  }
+  .card-info {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .card-name {
+    font-size: 1.12rem;
+    font-weight: 700;
+    margin-bottom: 0.3em;
+    color: var(--accent);
+  }
+  body.dark .card-name {
+    color: var(--accent-light);
+  }
+  .card-row {
+    font-size: 0.97rem;
+    color: #444;
+    margin-bottom: 0.09em;
+    display: flex;
+    gap: 0.45em;
+  }
+  body.dark .card-row {
+    color: #eee;
+  }
+}
+
+/* Neumorphic border for both themes */
+.patients-table, .patients-card {
+  border: 1.5px solid var(--border);
+}
+body.dark .patients-table,
+body.dark .patients-card {
+  border: 1.5px solid var(--border-dark);
+}
