@@ -36,3 +36,21 @@
     transform: rotate(360deg);
   }
 }
+
+
+.neumorph-card {
+  box-shadow: 0 2.5px 8px 0 #e0e5ec55, 0 1.5px 3px 0 #b3bdd7;
+}
+.neumorph-modal {
+  box-shadow: 0 4px 32px 0 #b3bdd7, 0 1.5px 3px 0 #e0e5ec;
+}
+.neumorph-fab {
+  box-shadow: 0 4px 16px 0 #e0e5ec88, 0 1.5px 3px 0 #b3bdd7;
+  transition: box-shadow 0.18s;
+}
+@media (prefers-color-scheme: dark) {
+  .neumorph-fab, .neumorph-card, .neumorph-modal {
+    box-shadow: 0 8px 32px 0 #14182488, 0 1.5px 3px 0 #232946;
+  }
+}
+

@@ -28,7 +28,7 @@ export default function StyledNavbar({ mode, toggleMode }) {
         <div className="sidebar-logo">
           <span>
             <FaBaby style={{ verticalAlign: 'middle', fontSize: 24, marginRight: 8 }} />
-             <Link to={"/"}>
+             <Link to={"/dash"}>
                  <strong>Maternity PMS</strong>
               </Link>
           </span>
