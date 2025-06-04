@@ -1,0 +1,107 @@
+require('dotenv').config()
+const pool = require('../poolfile')
+const axios = require('axios')
+
+let crudsObj = {}
+
+crudsObj.postAppointment = appointment => {
+  return new Promise((resolve, reject) => {
+    console.log('honai appointment:', appointment);
+    pool.query(
+      `INSERT INTO appointments (patient_id, staff_id, description, appointment_category, appointment_state, payment_status, due, status, date, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        appointment.patient_id, 
+        appointment.staff_id,
+        appointment.description,
+        appointment.appointment_category,
+        appointment.appointment_state,
+        appointment.payment_status,
+        appointment.due,
+        appointment.status,
+        appointment.date,
+        appointment.date_created
+      ],
+      (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve({ status: '200', message: 'Saving successful' });
+      }
+    );
+  });
+};
+
+crudsObj.getAppointments = () => {
+  return new Promise((resolve, reject) => {
+    pool.query('SELECT * FROM appointments', (err, results) => {
+      if (err) {
+        return reject(err)
+      }
+      return resolve(results)
+    })
+  })
+}
+
+crudsObj.getAppointmentById = appointmentId => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT * FROM appointments WHERE appointment_id = ?',
+      [appointmentId],
+      (err, results) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(results)
+      }
+    )
+  })
+}
+
+crudsObj.updateAppointment = (appointmentId, updatedValues) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      `UPDATE appointments SET 
+        staff_id = ?, 
+        description = ?, 
+        appointment_category = ?, 
+        appointment_state = ?, 
+        payment_status = ?, 
+        status = ?, 
+        date = ? 
+      WHERE appointment_id = ?`,
+      [
+        updatedValues.staff_id,
+        updatedValues.description,
+        updatedValues.appointment_category,
+        updatedValues.appointment_state,
+        updatedValues.payment_status,
+        updatedValues.status,
+        updatedValues.date,
+        appointmentId
+      ],
+      (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve({ status: '200', message: 'Update successful' });
+      }
+    );
+  });
+};
+
+crudsObj.deleteAppointment = id => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'DELETE FROM appointments WHERE appointment_id = ?',
+      [id],
+      (err, results) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve({ status: '200', message: 'update successful' })
+      }
+    )
+  })
+}
+
+module.exports = crudsObj

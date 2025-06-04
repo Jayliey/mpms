@@ -64,7 +64,12 @@ userRouter.get("/login/:email/:password", async (req, res, next) => {
     const email = req.params.email;
     const password = req.params.password;
     const result = await usersDbOperations.getUserByCred(email, password);
-    res.json(result);
+    
+    if (result) {
+      res.json(result); // Send user data as JSON
+    } else {
+      res.status(401).json({ message: 'Invalid email or password' }); // Handle unauthorized access
+    }
   } catch (error) {
     console.error(error);
     res.sendStatus(500);

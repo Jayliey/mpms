@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { antenatalVisits } from "../data";
+import { antenatalVisits } from "../services/data";
 
 // Avatar colors and icons
 const avatarColors = [

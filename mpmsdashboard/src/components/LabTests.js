@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { labTests } from "../data";
+import { labTests } from "../services/data";
 
 // Result color styles
 const RESULT_STYLES = {

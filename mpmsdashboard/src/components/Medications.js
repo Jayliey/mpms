@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { medications } from "../data";
+import { medications } from "../services/data";
 
 // Helper to color-code medication status
 function getStatus(med) {

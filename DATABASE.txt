@@ -7,7 +7,7 @@ Users => userId, email, password, role, staffId,*
 
 Roles => roleid, RValue*
 
-Appointments => appointmentId, description, appointmentStatus, date, Log, patientId, staffId, appointmentCategory
+Appointments => appointmentId, description, appointmentStatus, date, Log, patientId, staffId, appointmentCategory, payment status, status
 
 //Deliveries => 
 

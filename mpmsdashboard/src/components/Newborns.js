@@ -1,6 +1,6 @@
 // src/components/Newborns.js
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { newborns } from "../data";
+import { newborns } from "../services/data";
 
 // Emoji avatars for fun, fallback to a user icon
 const babyAvatars = ["👶", "🍼", "🧸", "🧑‍🍼", "🐣", "🌟", "🦄", "🐥", "🧁", "🦋"];

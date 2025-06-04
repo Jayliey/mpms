@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
-import { patients } from "../data";
-import "./Patients.css";
+import { patients } from "../services/data";
+import "../styles/Patients.css";
+
 
 function getInitials(name) {
   return name

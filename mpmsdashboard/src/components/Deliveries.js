@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { deliveries } from "../data";
+import { deliveries } from "../services/data";
 
 const OUTCOME_STYLES = {
   "Live Birth": "bg-[#20be6b22] text-[#20be6b]",

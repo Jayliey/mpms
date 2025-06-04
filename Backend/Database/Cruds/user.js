@@ -1,7 +1,7 @@
 require("dotenv").config();
 const pool = require("../poolfile");
 const axios = require("axios");
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 
 let crudsObj = {};
 
@@ -65,8 +65,8 @@ crudsObj.getUserByCred = (email, password) => {
         }
          if (results.length > 0) {
           // Create a token
-          const token = jwt.sign({ id: results[0].user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-          return resolve({ user: results[0], token });
+          // const token = jwt.sign({ id: results[0].user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+          return resolve(results[0]);
         }
       }
     );

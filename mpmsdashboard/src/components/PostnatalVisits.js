@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { postnatalVisits } from "../data";
+import { postnatalVisits } from "../services/data";
 
 // Fun colors for staff avatars
 const avatarColors = [

@@ -11,6 +11,7 @@ const userRouter = require("./Database/Routes/user");
 const patientRouter = require("./Database/Routes/patient");
 const staffRouter = require("./Database/Routes/staff");
 const roleRouter = require("./Database/Routes/roles");
+const appointmentRouter = require("./Database/Routes/appointments");
 
 const corsOptions = {
   origin: "*",
@@ -18,20 +19,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type"],
 };
 
-const authenticateJWT = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1]; // Get the token from the header
-  if (token) {
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.sendStatus(403); // Forbidden
-      }
-      req.user = user; // Save user info in request
-      next(); // Continue to the next middleware/route
-    });
-  } else {
-    res.sendStatus(401); // Unauthorized
-  }
-};
+
 
 //initialization//
 
@@ -43,6 +31,7 @@ app.use("/user", userRouter);
 app.use("/patient", patientRouter);
 app.use("/staff", staffRouter);
 app.use("/role", roleRouter);
+app.use("/appointment", appointmentRouter);
 
 /////////////////
 

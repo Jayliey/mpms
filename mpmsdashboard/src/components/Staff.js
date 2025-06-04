@@ -1,6 +1,6 @@
 // src/components/Staff.js
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { staff } from "../data";
+import { staff } from "../services/data";
 
 // Fun avatar colors and emojis by role
 const roleAvatars = {
@@ -28,6 +28,7 @@ export default function Staff() {
   const [search, setSearch] = useState("");
   const searchRef = useRef();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 800);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     function handler(e) {
@@ -57,6 +58,10 @@ export default function Staff() {
   useEffect(() => {
     setAnnounce(filtered.length === 0 ? "No staff found." : "");
   }, [filtered.length]);
+
+  const handleAddStaff = async() =>{
+
+  }
 
   return (
     <section className="patients-wrap" aria-labelledby="staff-heading" style={{marginTop:36, position:'relative'}}>
@@ -193,6 +198,66 @@ export default function Staff() {
           </div>
         )}
       </div>
+
+            {/* Floating Plus Button */}
+      <button
+        className="floating-button"
+        onClick={() => setModalOpen(true)}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          width: '60px',
+          height: '60px',
+          fontSize: '30px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+        }}
+      >
+        +
+      </button>
+
+      {/* Modal for Adding Staff */}
+      {modalOpen && (
+        <div className="modal" style={{
+          display: 'flex',
+          position: 'fixed',
+          zIndex: 1000,
+          left: 0,
+          top: 0,
+          width: '100%',
+          height: '100%',
+          overflow: 'auto',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '5px',
+            width: '80%',
+            maxWidth: '500px',
+          }}>
+            <h2>Add New Staff</h2>
+            <form onSubmit={handleAddStaff}>
+              <label htmlFor="name">Name:</label><br />
+              <input type="text" id="name" name="name" required /><br /><br />
+              <label htmlFor="role">Role:</label><br />
+              <input type="text" id="role" name="role" required /><br /><br />
+              <button type="submit">Add Staff</button>
+              <button type="button" onClick={() => setModalOpen(false)}>Cancel</button>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

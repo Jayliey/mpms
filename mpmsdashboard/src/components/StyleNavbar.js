@@ -4,7 +4,7 @@ import {
   FaUserMd, FaCalendarAlt, FaBaby, FaFlask, FaPills, FaHeartbeat,
   FaChild, FaUserNurse, FaBars, FaTimes, FaMoon, FaSun
 } from 'react-icons/fa';
-import './StyledNavbar.css';
+import '../styles/StyledNavbar.css';
 
 const navLinks = [
   { to: '/patients', label: 'Patients', icon: <FaUserMd /> },
