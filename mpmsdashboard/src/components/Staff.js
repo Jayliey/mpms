@@ -1,24 +1,27 @@
-// src/components/Staff.js
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { staff } from "../services/data";
+import AddStaffModal from "./AddStaffModal";
 
-// Fun avatar colors and emojis by role
 const roleAvatars = {
   doctor: "🩺",
   nurse: "💉",
   admin: "🗂️",
   technician: "🔬",
   midwife: "🧑‍🍼",
-  default: "👤"
+  default: "👤",
 };
+
 const avatarColors = [
   "#7f5af0", "#f6c177", "#5adbb5", "#f875aa", "#90e0ef", "#cfbaf0"
 ];
+
 function stringToColor(str) {
   let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < str.length; i++)
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
   return avatarColors[Math.abs(hash) % avatarColors.length];
 }
+
 function getAvatar(role, name) {
   const key = String(role || '').toLowerCase();
   return roleAvatars[key] || roleAvatars.default;
@@ -29,13 +32,15 @@ export default function Staff() {
   const searchRef = useRef();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 800);
   const [modalOpen, setModalOpen] = useState(false);
+  const [announce, setAnnounce] = useState("");
 
   useEffect(() => {
-    function handler(e) {
+    const handler = (e) => {
       if ((e.key === "/" || e.key === "s") && !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) {
-        e.preventDefault(); searchRef.current?.focus();
+        e.preventDefault();
+        searchRef.current?.focus();
       }
-    }
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
@@ -54,210 +59,142 @@ export default function Staff() {
     );
   }, [search]);
 
-  const [announce, setAnnounce] = useState("");
   useEffect(() => {
     setAnnounce(filtered.length === 0 ? "No staff found." : "");
   }, [filtered.length]);
 
-  const handleAddStaff = async() =>{
-
-  }
+  const handleAddStaff = async () => {
+    // Handle staff addition logic
+  };
 
   return (
-    <section className="patients-wrap" aria-labelledby="staff-heading" style={{marginTop:36, position:'relative'}}>
-      <div className="patients-bg-anim" aria-hidden="true" />
-      <header className="patients-header">
-        <h2 id="staff-heading" tabIndex={-1} aria-label="Staff List">
-          <svg width="29" height="29" viewBox="0 0 24 24" aria-hidden="true" style={{marginRight:8, filter:"drop-shadow(0 2px 12px #7f5af022)"}}>
-            <circle cx="12" cy="12" r="10" fill="#7f5af0"/>
-            <path d="M12 12c-2.5-3.5-6 0-1.5 4.5S17 12 12 12z" fill="#fff"/>
+    <section className="relative mt-9 px-4">
+      <header className="flex flex-col md:flex-row justify-between items-center mb-6">
+        <h2
+          className="text-2xl font-bold flex items-center gap-2"
+          id="staff-heading"
+          tabIndex={-1}
+        >
+          <svg width="29" height="29" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" fill="#7f5af0" />
+            <path d="M12 12c-2.5-3.5-6 0-1.5 4.5S17 12 12 12z" fill="#fff" />
           </svg>
           Staff
         </h2>
-        <form className="search-bar" role="search" aria-label="Search staff" onSubmit={e => e.preventDefault()}>
-          <svg width="20" height="20" fill="none" stroke="#7f5af0" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"/>
-            <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+
+        <form
+          className="mt-4 md:mt-0 flex items-center border border-gray-300 rounded-md px-3 py-2 w-full md:w-80 bg-white shadow-sm"
+          role="search"
+          aria-label="Search staff"
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <svg width="20" height="20" fill="none" stroke="#7f5af0" strokeWidth="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" />
           </svg>
           <input
             ref={searchRef}
+            className="ml-2 w-full outline-none"
             aria-label="Search staff"
             placeholder="Search…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             autoComplete="off"
-            style={{minWidth: 0}}
           />
         </form>
       </header>
+
       <span className="sr-only" aria-live="polite">{announce}</span>
 
-      <div className="patients-table-outer">
-        {/* Desktop Table */}
-        {!isMobile && (
-          <table className="patients-table" aria-label="Staff Table">
-            <thead>
+      {!isMobile ? (
+        <table className="w-full table-auto border-collapse shadow rounded-md overflow-hidden bg-white">
+          <thead className="bg-gray-100 text-left text-sm text-gray-700">
+            <tr>
+              <th className="px-4 py-2">ID</th>
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.length === 0 ? (
               <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Name</th>
-                <th scope="col">Role</th>
+                <td colSpan={3} className="text-center py-4 text-gray-500">
+                  No staff found.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="empty">No staff found.</td>
-                </tr>
-              )}
-              {filtered.map((member, i) => (
-                <tr
-                  key={member.id}
-                  className="patients-row"
-                  tabIndex={0}
-                  aria-label={`${member.name}, ${member.role}, ID ${member.id}`}
-                  style={{
-                    "--glass": "rgba(255,255,255,0.62)",
-                    "--glass-dark": "rgba(36,39,48,0.63)",
-                  }}
-                >
-                  <td>
-                    <span className="avatar"
-                      style={{
-                        background: `linear-gradient(120deg, ${stringToColor(member.name+member.id)} 0%, #f6f7fb 100%)`,
-                        color: "#fff"
-                      }}
-                      aria-label={`Avatar for ${member.name}`}
-                    >{getAvatar(member.role, member.name)}</span>
-                    <span style={{marginLeft:8, fontWeight:600}}>{member.id}</span>
-                  </td>
-                  <td style={{fontWeight:600, letterSpacing:0.2}}>{member.name}</td>
-                  <td>
+            ) : (
+              filtered.map((member) => (
+                <tr key={member.id} className="border-t hover:bg-gray-50 focus-within:bg-gray-50">
+                  <td className="px-4 py-3 flex items-center gap-2">
                     <span
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
                       style={{
-                        display:"inline-block",
-                        fontWeight:"bold",
-                        fontSize:"0.98em",
-                        padding:"0.14em 0.9em",
-                        borderRadius:"0.8em",
-                        background:"#f6f7fb",
-                        color:"#7f5af0",
-                        textTransform:"capitalize",
-                        boxShadow:"0 1px 3px #ccc2"
+                        background: `linear-gradient(120deg, ${stringToColor(member.name + member.id)} 0%, #f6f7fb 100%)`
                       }}
-                    >{member.role}</span>
+                    >
+                      {getAvatar(member.role, member.name)}
+                    </span>
+                    <span className="font-semibold">{member.id}</span>
+                  </td>
+                  <td className="px-4 py-3 font-medium">{member.name}</td>
+                  <td className="px-4 py-3">
+                    <span className="inline-block text-sm font-semibold text-violet-600 bg-gray-100 px-3 py-1 rounded-full capitalize">
+                      {member.role}
+                    </span>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-
-        {/* Mobile Cards */}
-        {isMobile && (
-          <div className="patients-cards" role="list" aria-label="Staff Cards">
-            {filtered.length === 0 && (
-              <div className="empty">No staff found.</div>
+              ))
             )}
-            {filtered.map((member, i) => (
+          </tbody>
+        </table>
+      ) : (
+        <div className="grid gap-4">
+          {filtered.length === 0 ? (
+            <div className="text-center text-gray-500">No staff found.</div>
+          ) : (
+            filtered.map((member) => (
               <div
                 key={member.id}
-                className="patients-card"
-                tabIndex={0}
-                aria-label={`${member.name}, ${member.role}, ID ${member.id}`}
-                style={{
-                  "--glass": "rgba(255,255,255,0.62)",
-                  "--glass-dark": "rgba(36,39,48,0.63)",
-                }}
+                className="bg-white rounded-lg shadow p-4 flex items-center gap-4"
               >
-                <span className="avatar"
+                <span
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
                   style={{
-                    background: `linear-gradient(120deg, ${stringToColor(member.name+member.id)} 0%, #f6f7fb 100%)`,
-                    color: "#fff"
+                    background: `linear-gradient(120deg, ${stringToColor(member.name + member.id)} 0%, #f6f7fb 100%)`
                   }}
-                  aria-label={`Avatar for ${member.name}`}
-                >{getAvatar(member.role, member.name)}</span>
-                <div className="card-info">
-                  <div className="card-name">{member.name}</div>
-                  <div className="card-row"><strong>ID:</strong> {member.id}</div>
-                  <div className="card-row"><strong>Role:</strong>
-                    <span style={{
-                      marginLeft:6,
-                      fontWeight:"bold",
-                      fontSize:"0.97em",
-                      padding:"0.08em 0.7em",
-                      borderRadius:"0.8em",
-                      background:"#f6f7fb",
-                      color:"#7f5af0",
-                      textTransform:"capitalize",
-                      boxShadow:"0 1px 3px #ccc2"
-                    }}>{member.role}</span>
+                >
+                  {getAvatar(member.role, member.name)}
+                </span>
+                <div>
+                  <div className="font-semibold">{member.name}</div>
+                  <div className="text-sm text-gray-600">ID: {member.id}</div>
+                  <div className="text-sm">
+                    <span className="inline-block mt-1 text-sm font-semibold text-violet-600 bg-gray-100 px-3 py-1 rounded-full capitalize">
+                      {member.role}
+                    </span>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            ))
+          )}
+        </div>
+      )}
 
-            {/* Floating Plus Button */}
+      {/* Floating Plus Button */}
       <button
-        className="floating-button"
+        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full w-14 h-14 flex items-center justify-center text-3xl shadow-lg"
         onClick={() => setModalOpen(true)}
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          backgroundColor: '#007bff',
-          color: 'white',
-          border: 'none',
-          borderRadius: '50%',
-          width: '60px',
-          height: '60px',
-          fontSize: '30px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-        }}
+        aria-label="Add staff"
       >
         +
       </button>
 
-      {/* Modal for Adding Staff */}
-      {modalOpen && (
-        <div className="modal" style={{
-          display: 'flex',
-          position: 'fixed',
-          zIndex: 1000,
-          left: 0,
-          top: 0,
-          width: '100%',
-          height: '100%',
-          overflow: 'auto',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-          <div className="modal-content" style={{
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '5px',
-            width: '80%',
-            maxWidth: '500px',
-          }}>
-            <h2>Add New Staff</h2>
-            <form onSubmit={handleAddStaff}>
-              <label htmlFor="name">Name:</label><br />
-              <input type="text" id="name" name="name" required /><br /><br />
-              <label htmlFor="role">Role:</label><br />
-              <input type="text" id="role" name="role" required /><br /><br />
-              <button type="submit">Add Staff</button>
-              <button type="button" onClick={() => setModalOpen(false)}>Cancel</button>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Add Staff Modal */}
+      <AddStaffModal
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+        handleAddStaff={handleAddStaff}
+      />
     </section>
   );
 }

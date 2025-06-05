@@ -12,6 +12,7 @@ const patientRouter = require("./Database/Routes/patient");
 const staffRouter = require("./Database/Routes/staff");
 const roleRouter = require("./Database/Routes/roles");
 const appointmentRouter = require("./Database/Routes/appointments");
+const getWayRoute = require("./paynow/getWay")
 
 const corsOptions = {
   origin: "*",
@@ -22,8 +23,6 @@ const corsOptions = {
 
 
 //initialization//
-
-
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
@@ -32,6 +31,7 @@ app.use("/patient", patientRouter);
 app.use("/staff", staffRouter);
 app.use("/role", roleRouter);
 app.use("/appointment", appointmentRouter);
+app.use("/payment", getWayRoute);
 
 /////////////////
 

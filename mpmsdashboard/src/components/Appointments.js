@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { appointments as initialAppointments } from "../services/data";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from '../styles/appointments.module.css'
 import { URL } from "../services/endpoints";
