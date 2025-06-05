@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { staff } from "../services/data";
 import AddStaffModal from "./AddStaffModal";
+import { URL } from "../services/endpoints";
 
 const roleAvatars = {
   doctor: "🩺",
@@ -22,9 +22,8 @@ function stringToColor(str) {
   return avatarColors[Math.abs(hash) % avatarColors.length];
 }
 
-function getAvatar(role, name) {
-  const key = String(role || '').toLowerCase();
-  return roleAvatars[key] || roleAvatars.default;
+function getAvatar(role) {
+  return roleAvatars[role] || roleAvatars.default;
 }
 
 export default function Staff() {
@@ -32,6 +31,7 @@ export default function Staff() {
   const searchRef = useRef();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 800);
   const [modalOpen, setModalOpen] = useState(false);
+  const [staff, setStaff] = useState([]); // Initialize with an empty array
   const [announce, setAnnounce] = useState("");
 
   useEffect(() => {
@@ -55,26 +55,57 @@ export default function Staff() {
     const q = search.trim().toLowerCase();
     if (!q) return staff;
     return staff.filter(member =>
-      [member.id, member.name, member.role].join(" ").toLowerCase().includes(q)
+      [member.staff_id, member.name, member.role].join(" ").toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, staff]);
+
+  useEffect(() => {
+    fetchStaff();
+  }, []);
 
   useEffect(() => {
     setAnnounce(filtered.length === 0 ? "No staff found." : "");
   }, [filtered.length]);
 
+  const fetchStaff = async () => {
+    try {
+      const response = await fetch(`${URL}/staff/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+      setStaff(result); // Update the state with fetched data
+      console.log("Fetched Staff:", result);
+    } catch (error) {
+      console.error("Error fetching Staff:", error);
+    }
+  };
+
   const handleAddStaff = async () => {
     // Handle staff addition logic
+  };
+
+  const handleEditStaff = (staffId) => {
+    // Logic to edit staff
+    console.log("Edit staff with ID:", staffId);
+  };
+
+  const handleDeleteStaff = async (staffId) => {
+    // Logic to delete staff
+    console.log("Delete staff with ID:", staffId);
   };
 
   return (
     <section className="relative mt-9 px-4">
       <header className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h2
-          className="text-2xl font-bold flex items-center gap-2"
-          id="staff-heading"
-          tabIndex={-1}
-        >
+        <h2 className="text-2xl font-bold flex items-center gap-2" id="staff-heading" tabIndex={-1}>
           <svg width="29" height="29" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="10" fill="#7f5af0" />
             <path d="M12 12c-2.5-3.5-6 0-1.5 4.5S17 12 12 12z" fill="#fff" />
@@ -113,34 +144,54 @@ export default function Staff() {
               <th className="px-4 py-2">ID</th>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Role</th>
+              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Gender</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={3} className="text-center py-4 text-gray-500">
+                <td colSpan={6} className="text-center py-4 text-gray-500">
                   No staff found.
                 </td>
               </tr>
             ) : (
               filtered.map((member) => (
-                <tr key={member.id} className="border-t hover:bg-gray-50 focus-within:bg-gray-50">
+                <tr key={member.staff_id} className="border-t hover:bg-gray-50 focus-within:bg-gray-50">
                   <td className="px-4 py-3 flex items-center gap-2">
                     <span
                       className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
                       style={{
-                        background: `linear-gradient(120deg, ${stringToColor(member.name + member.id)} 0%, #f6f7fb 100%)`
+                        background: `linear-gradient(120deg, ${stringToColor(member.name + member.staff_id)} 0%, #f6f7fb 100%)`
                       }}
                     >
-                      {getAvatar(member.role, member.name)}
+                      {getAvatar(member.role)}
                     </span>
-                    <span className="font-semibold">{member.id}</span>
+                    <span className="font-semibold">{member.staff_id}</span>
                   </td>
-                  <td className="px-4 py-3 font-medium">{member.name}</td>
+                  <td className="px-4 py-3 font-medium">{member.name} {member.surname}</td>
                   <td className="px-4 py-3">
                     <span className="inline-block text-sm font-semibold text-violet-600 bg-gray-100 px-3 py-1 rounded-full capitalize">
                       {member.role}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">{member.email}</td>
+                  <td className="px-4 py-3">{member.gender}</td>
+                  <td className="px-4 py-3 flex gap-2">
+                    <button onClick={() => handleEditStaff(member.staff_id)} aria-label="Edit">
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M12 20h9" />
+                        <path d="M15 17l5-5-2-2-5 5" />
+                        <path d="M3 21v-2a2 2 0 0 1 2-2h2l6-6 2 2-6 6v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      </svg>
+                    </button>
+                    <button onClick={() => handleDeleteStaff(member.staff_id)} aria-label="Delete">
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M3 6h18" />
+                        <path d="M9 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M10 2h4M4 6v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6" />
+                      </svg>
+                    </button>
                   </td>
                 </tr>
               ))
@@ -153,25 +204,34 @@ export default function Staff() {
             <div className="text-center text-gray-500">No staff found.</div>
           ) : (
             filtered.map((member) => (
-              <div
-                key={member.id}
-                className="bg-white rounded-lg shadow p-4 flex items-center gap-4"
-              >
+              <div key={member.staff_id} className="bg-white rounded-lg shadow p-4 flex items-center gap-4">
                 <span
                   className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
                   style={{
-                    background: `linear-gradient(120deg, ${stringToColor(member.name + member.id)} 0%, #f6f7fb 100%)`
+                    background: `linear-gradient(120deg, ${stringToColor(member.name + member.staff_id)} 0%, #f6f7fb 100%)`
                   }}
                 >
-                  {getAvatar(member.role, member.name)}
+                  {getAvatar(member.role)}
                 </span>
-                <div>
-                  <div className="font-semibold">{member.name}</div>
-                  <div className="text-sm text-gray-600">ID: {member.id}</div>
-                  <div className="text-sm">
-                    <span className="inline-block mt-1 text-sm font-semibold text-violet-600 bg-gray-100 px-3 py-1 rounded-full capitalize">
-                      {member.role}
-                    </span>
+                <div className="flex-grow">
+                  <div className="font-semibold">{member.name} {member.surname}</div>
+                  <div className="text-sm text-gray-600">ID: {member.staff_id}</div>
+                  <div className="text-sm">Email: {member.email}</div>
+                  <div className="text-sm">Gender: {member.gender}</div>
+                  <div className="mt-2 flex gap-2">
+                    <button onClick={() => handleEditStaff(member.staff_id)} aria-label="Edit">
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M12 20h9" />
+                        <path d="M15 17l5-5-2-2-5 5" />
+                        <path d="M3 21v-2a2 2 0 0 1 2-2h2l6-6 2 2-6 6v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      </svg>
+                    </button>
+                    <button onClick={() => handleDeleteStaff(member.staff_id)} aria-label="Delete">
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M3 6h18" />
+                        <path d="M9 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M10 2h4M4 6v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>

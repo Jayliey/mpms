@@ -72,6 +72,21 @@ crudsObj.getPatientById = (patientId) => {
   });
 };
 
+crudsObj.getPatientByIdNum = (patientId) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      "SELECT * FROM patient WHERE id_number = ?",
+      [patientId],
+      (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(results);
+      }
+    );
+  });
+};
+
 crudsObj.updatePatient = (
   patientId,
 updatedValues

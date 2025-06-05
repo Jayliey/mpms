@@ -85,6 +85,22 @@ patientRouter.get("/:id", async (req, res, next) => {
   }
 });
 
+patientRouter.get("/login/:id", async (req, res, next) => {
+  try {
+    const patientId = req.params.id;
+    const patient = await patientsDbOperations.getPatientByIdNum(patientId);
+
+    if (!patient) {
+      return res.status(404).json({ message: "patient not found" });
+    }
+
+    res.json(patient);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
 patientRouter.put("/:id", async (req, res, next) => {
   try {
     const patientId = req.params.id;

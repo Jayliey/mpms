@@ -1,7 +1,10 @@
-// Login.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaUserNurse, FaUserMd, FaUserInjured, FaMoon, FaSun } from "react-icons/fa";
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import { API } from "../services/api";
+
 
 const glass =
   "backdrop-blur-lg bg-white/60 dark:bg-slate-900/70 shadow-2xl ring-1 ring-neutral-200/50 dark:ring-slate-800/80";
@@ -13,7 +16,6 @@ const labelBase =
   "absolute left-4 top-3 text-neutral-400 dark:text-neutral-500 text-base pointer-events-none transition-all duration-200 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-400 dark:peer-placeholder-shown:text-neutral-600 peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-500 dark:peer-focus:text-teal-400 bg-inherit px-1";
 
 function AnimatedBG({ darkMode }) {
-  // Morphing SVG blobs for ambient animation
   return (
     <svg
       className="fixed inset-0 w-full h-full z-0 pointer-events-none"
@@ -71,8 +73,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [darkMode, setDarkMode] = useState(false);
+  const navigate =useNavigate();
 
-  // Accessibility: focus on first input on mount
   const firstInputRef = useRef();
   useEffect(() => {
     firstInputRef.current?.focus();
@@ -86,27 +88,87 @@ export default function Login() {
     setPassword("");
   };
 
-  // Demo login handler (replace with your API logic)
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     setError("");
     if (role === "patient" && !userId) {
       setError("Please enter your ID number.");
       return;
+    }else{
+      await fetchPatient()
     }
     if ((role === "nurse" || role === "doctor") && (!email || !password)) {
       setError("Please fill in all fields.");
       return;
+    }else{
+      await fetchStaff();
     }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      // navigate("/dashboard");
       alert("Logged in! (demo)");
     }, 1200);
   };
 
-  // Role icons
+
+const fetchPatient = async() => {
+         try {
+        console.log("Logging in with:", userId);
+        const response = await fetch(`${API}/patient/login/${userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result) {
+          // Successful login logic here
+          await Swal.fire('Success!', 'You have logged in successfully!', 'success');
+          // onLogin(); // Call your login function to update state
+          navigate("/dashboard"); // Uncomment to navigate to dashboard
+        } else {
+          await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
+        }
+      } catch (error) {
+        console.log("Error", error);
+        await Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
+      }
+}
+
+
+const fetchStaff = async() => {
+         try {
+        console.log("Logging in with:", email, password);
+        const response = await fetch(`${API}/user/login/${email}/${password}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result) {
+          // Successful login logic here
+          await Swal.fire('Success!', 'You have logged in successfully!', 'success');
+          // onLogin(); // Call your login function to update state
+          navigate("/dashboard"); // Uncomment to navigate to dashboard
+        } else {
+          await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
+        }
+      } catch (error) {
+        console.log("Error", error);
+        await Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
+      }
+}
+
+
+
+
+
+
   const roleOptions = [
     {
       value: "nurse",
@@ -156,13 +218,12 @@ export default function Login() {
             aria-modal="true"
             aria-label="Login form"
           >
-            {/* Dark/Light Mode Toggle */}
+            {/* Theme Toggle */}
             <button
               type="button"
               onClick={() => setDarkMode((d) => !d)}
               aria-label={`Switch to ${darkMode ? "light" : "dark"} mode`}
               className="absolute top-4 right-4 p-2 rounded-xl shadow-sm bg-white/70 dark:bg-slate-800/80 hover:bg-white/90 dark:hover:bg-slate-700/80 transition"
-              tabIndex={0}
             >
               {darkMode ? (
                 <FaSun className="w-6 h-6 text-yellow-400" />
@@ -174,8 +235,9 @@ export default function Login() {
             <h2 className="text-2xl font-bold mb-8 text-blue-700 dark:text-teal-300 text-center drop-shadow">
               Welcome Back
             </h2>
+
             <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
-              {/* Role Selection */}
+              {/* Role Selector */}
               <fieldset className="flex justify-center gap-4 mb-3" aria-label="Select Role">
                 {roleOptions.map((opt) => (
                   <label
@@ -186,7 +248,6 @@ export default function Login() {
                           ? "border-blue-500 dark:border-teal-400 bg-blue-50/50 dark:bg-slate-800/60 shadow-lg"
                           : "border-transparent bg-transparent hover:bg-blue-100/40 dark:hover:bg-slate-700/60"
                       }`}
-                    tabIndex={0}
                   >
                     <input
                       type="radio"
@@ -194,13 +255,8 @@ export default function Login() {
                       checked={role === opt.value}
                       onChange={handleRoleChange}
                       className="sr-only"
-                      aria-checked={role === opt.value}
                     />
-                    <span
-                      className={`text-2xl transition-transform mb-1 ${
-                        role === opt.value ? "scale-110 drop-shadow" : "opacity-70"
-                      }`}
-                    >
+                    <span className={`text-2xl ${role === opt.value ? "scale-110" : "opacity-70"}`}>
                       {opt.icon}
                     </span>
                     <span
@@ -216,7 +272,7 @@ export default function Login() {
                 ))}
               </fieldset>
 
-              {/* Conditional Inputs */}
+              {/* Inputs */}
               <AnimatePresence mode="wait">
                 {role === "patient" ? (
                   <motion.div
@@ -237,7 +293,6 @@ export default function Login() {
                         className={inputBase}
                         placeholder=" "
                         aria-label="ID Number"
-                        aria-required="true"
                       />
                       <label htmlFor="userId" className={labelBase}>
                         ID Number
@@ -262,8 +317,6 @@ export default function Login() {
                         required
                         className={inputBase}
                         placeholder=" "
-                        aria-label="Email Address"
-                        aria-required="true"
                       />
                       <label htmlFor="email" className={labelBase}>
                         Email Address
@@ -278,8 +331,6 @@ export default function Login() {
                         required
                         className={inputBase}
                         placeholder=" "
-                        aria-label="Password"
-                        aria-required="true"
                         autoComplete="current-password"
                       />
                       <label htmlFor="password" className={labelBase}>
@@ -306,7 +357,7 @@ export default function Login() {
                 )}
               </AnimatePresence>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <motion.button
                 type="submit"
                 disabled={loading}
@@ -316,10 +367,22 @@ export default function Login() {
                     : "bg-gradient-to-r from-blue-500 to-teal-400 dark:from-teal-600 dark:to-blue-500 text-white hover:scale-105 focus:scale-105 focus:ring-2 focus:ring-blue-400 dark:focus:ring-teal-300"
                 }`}
                 whileTap={{ scale: 0.97 }}
-                aria-disabled={loading}
               >
                 {loading ? "Signing In..." : "Sign In"}
               </motion.button>
+
+              {/* Signup Link */}
+              <div className="text-center text-sm mt-4">
+                <span className="text-neutral-600 dark:text-neutral-400">
+                  Don't have an account?{" "}
+                </span>
+                <a
+                  href="/signup"
+                  className="font-medium text-blue-600 dark:text-teal-300 hover:underline"
+                >
+                  Sign up
+                </a>
+              </div>
             </form>
           </motion.div>
         </AnimatePresence>
