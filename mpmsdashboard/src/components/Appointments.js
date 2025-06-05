@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { appointments as initialAppointments } from "../services/data";
 import { motion, AnimatePresence } from "framer-motion";
-import { loadFull } from "tsparticles";
-import Particles from "react-tsparticles";
+import styles from '../styles/appointments.module.css'
+import { URL } from "../services/endpoints";
 
 // ---- STATUS STYLES ----
 const STATUS_STYLES = {
@@ -18,27 +18,9 @@ const STATUS_LIST = ["Scheduled", "Completed", "Cancelled", "Pending", "Missed"]
 // ---- COLOR PALETTE ----
 const auroraGradLight = "linear-gradient(120deg,#e0e5ec 0%,#f6f8fc 100%)";
 const auroraGradDark = "linear-gradient(120deg,#181b23 0%,#232946 100%)";
-const glassBlur = "backdrop-filter: blur(18px);background:rgba(255,255,255,0.16);";
-
-// ---- PARTICLES CONFIG ----
-const particlesOptions = (isDark) => ({
-  fpsLimit: 60,
-  fullScreen: { enable: false },
-  style: { position: "absolute", inset: 0, zIndex: 0 },
-  particles: {
-    color: { value: isDark ? "#7f5af0" : "#f6c177" },
-    links: { enable: false },
-    move: { enable: true, speed: 0.3, direction: "none", outModes: "out" },
-    number: { value: 24, density: { enable: true, area: 800 } },
-    opacity: { value: 0.19, random: true },
-    shape: { type: "circle" },
-    size: { value: { min: 1.5, max: 3.2 }, random: true },
-  },
-  detectRetina: true
-});
 
 // ---- ICONS ----
-const icons = {
+const STATUS_ICON  = {
   All: "📅", Scheduled: "⏳", Completed: "✅", Pending: "🕒", Missed: "❗", Cancelled: "🚫"
 };
 const STATUS_ICONS = {
@@ -54,99 +36,6 @@ const FILTERS = [
   { key: "Cancelled", icon: "🚫", label: "Cancelled" },
 ];
 
-// ---- STAT CARDS ----
-function DashboardSummary({ data, isDark }) {
-  // Animated count-up for cards
-  function useCountUp(final) {
-    const [count, setCount] = useState(0);
-    useEffect(() => {
-      let start = 0;
-      const step = Math.ceil(final / 24);
-      const interval = setInterval(() => {
-        start += step;
-        setCount(start > final ? final : start);
-        if (start >= final) clearInterval(interval);
-      }, 18);
-      return () => clearInterval(interval);
-    }, [final]);
-    return count;
-  }
-
-  const summary = useMemo(() => {
-    const counts = { All: 0 };
-    STATUS_LIST.forEach(status => counts[status] = 0);
-    data.forEach(a => {
-      counts.All += 1;
-      if (counts[a.status] !== undefined) counts[a.status] += 1;
-    });
-    return counts;
-  }, [data]);
-
-  
-
-  // Card gradient
-  const cardGrads = isDark
-    ? [
-        "from-[#232946dd] to-[#7f5af0cc]",
-        "from-[#181b23cc] to-[#20be6bcc]",
-        "from-[#232946cc] to-[#f6c177cc]",
-        "from-[#232946cc] to-[#f1515bcc]",
-        "from-[#232946cc] to-[#ffad30cc]",
-        "from-[#181b23cc] to-[#e0e5eccf]"
-      ]
-    : [
-        "from-[#e0e5ecf8] to-[#7f5af0ad]",
-        "from-[#e0e5ecf8] to-[#20be6bad]",
-        "from-[#e0e5ecf8] to-[#f6c177ad]",
-        "from-[#e0e5ecf8] to-[#f1515bad]",
-        "from-[#e0e5ecf8] to-[#ffad30ad]",
-        "from-[#e0e5ecf8] to-[#232946ad]"
-      ];
-  const keys = ["All", ...STATUS_LIST];
-
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 z-10 relative">
-      {keys.map((k, idx) => {
-        // const count = useCountUp(summary[k]);
-        return (
-          <motion.div
-            key={k}
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.08, duration: 0.5, type: "spring" }}
-            tabIndex={0}
-            aria-label={`${k} appointments`}
-            className={`rounded-2xl px-2 py-4 sm:px-4 flex flex-col items-center shadow-xl neumorph-card
-              cursor-default group relative overflow-hidden border-0
-              bg-gradient-to-br ${cardGrads[idx]}
-              ${isDark ? "text-white" : "text-[#232946]"}`}
-            style={{
-              backdropFilter: "blur(10px)",
-              boxShadow: isDark
-                ? "0 6px 26px 0 #191e3080, 0 1.5px 3px 0 #232946"
-                : "0 6px 22px 0 #b3bdd7aa, 0 1.5px 3px 0 #e0e5ec"
-            }}
-          >
-            <span className="text-2xl mb-1 drop-shadow-lg">{icons[k]}</span>
-            <span className="font-extrabold text-xl drop-shadow">{}</span>
-            <span className="text-xs mt-1 opacity-80 tracking-wide">{k}</span>
-            <motion.div
-              className="absolute -inset-2 rounded-2xl pointer-events-none"
-              initial={{ opacity: 0.13 }}
-              animate={{ opacity: [0.13, 0.19, 0.13], scale: [1, 1.04, 1] }}
-              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-              style={{
-                background: isDark
-                  ? "radial-gradient(ellipse at 40% 30%, #7f5af033 0%,transparent 60%)"
-                  : "radial-gradient(ellipse at 60% 30%, #f6c17733 0%,transparent 70%)"
-              }}
-            />
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-}
 
 // ---- STATUS BADGE ----
 function StatusBadge({ status }) {
@@ -193,14 +82,34 @@ function AppointmentCard({ appt, tabIndex, onKeyDown }) {
         <div className="card-name font-semibold text-lg mb-1 flex items-center">
           <span className="mr-2">#{appt.appointment_id}</span>
           <StatusBadge status={appt.status} />
+          <span className="ml-2 text-2xl">{STATUS_ICON[appt.status]}</span> {/* Add icon here */}
         </div>
         <div className="flex gap-4 flex-wrap">
-          <div className="card-row"><span className="font-semibold">Patient:</span> {appt.patient_id}</div>
-          <div className="card-row"><span className="font-semibold">Staff:</span> {appt.staff_id}</div>
+          <div className="card-row">
+            <span className="font-semibold">Patient:</span> {appt.patient_id}
+          </div>
+          <div className="card-row">
+            <span className="font-semibold">Staff:</span> {appt.staff_id}
+          </div>
+          <div className="card-row">
+            <span className="font-semibold">Category:</span> {appt.appointment_category}
+          </div>
+          <div className="card-row">
+            <span className="font-semibold">State:</span> {appt.appointment_state}
+          </div>
         </div>
-        <div className="card-row"><span className="font-semibold">Type:</span> {appt.appointment_type}</div>
-        <div className="card-row"><span className="font-semibold">Date:</span> {appt.date}</div>
-        <div className="card-row"><span className="font-semibold">Time:</span> {appt.time}</div>
+        <div className="card-row">
+          <span className="font-semibold">Type:</span> {appt.appointment_type}
+        </div>
+        <div className="card-row">
+          <span className="font-semibold">Date:</span> {new Date(appt.date).toLocaleDateString()}
+        </div>
+        <div className="card-row">
+          <span className="font-semibold">Time:</span> {new Date(appt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </div>
+        <div className="card-row">
+          <span className="font-semibold">Description:</span> {appt.description}
+        </div>
       </div>
     </motion.div>
   );
@@ -223,11 +132,14 @@ function AppointmentRow({ appt, tabIndex, onKeyDown }) {
       <td>{appt.patient_id}</td>
       <td>{appt.staff_id}</td>
       <td>{appt.appointment_type}</td>
-      <td>{appt.date}</td>
-      <td>{appt.time}</td>
+      <td>{new Date(appt.date).toLocaleDateString()}</td>
+      <td>{new Date(appt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
       <td>
         <StatusBadge status={appt.status} />
       </td>
+      <td>{appt.appointment_category}</td>
+      <td>{appt.appointment_state}</td>
+      <td>{appt.description}</td>
     </motion.tr>
   );
 }
@@ -283,234 +195,183 @@ function FloatingAddButton({ onClick, isDark }) {
 
 // ---- MODAL ----
 function AddAppointmentModal({ open, onClose, onAdd, isDark }) {
-  const [form, setForm] = useState({
-    patient_id: "",
-    staff_id: "",
-    appointment_type: "",
-    date: "",
-    time: "",
-    status: "Scheduled",
-  });
-  const dialogRef = useRef();
-
-  useEffect(() => {
-    if (open) {
-      dialogRef.current?.focus();
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => (document.body.style.overflow = "");
-  }, [open]);
-
-  // Focus trap and esc
-  useEffect(() => {
-    if (!open) return;
-    function handleTab(e) {
-      if (!dialogRef.current) return;
-      const focusable = dialogRef.current.querySelectorAll(
-        "input,select,button,[tabindex]:not([tabindex='-1'])"
-      );
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.key === "Tab") {
-        if (e.shiftKey) {
-          if (document.activeElement === first) {
-            e.preventDefault();
-            last.focus();
-          }
-        } else {
-          if (document.activeElement === last) {
-            e.preventDefault();
-            first.focus();
-          }
-        }
-      }
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleTab);
-    return () => document.removeEventListener("keydown", handleTab);
-  }, [open, onClose]);
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  }
-  function handleSubmit(e) {
-    e.preventDefault();
-    onAdd(form);
-    onClose();
-    setForm({
-      patient_id: "",
-      staff_id: "",
-      appointment_type: "",
-      date: "",
-      time: "",
-      status: "Scheduled",
+    const [form, setForm] = useState({
+        patient_id: "",
+        staff_id: "",
+        appointment_type: "",
+        date: "",
+        time: "",
+        status: "Scheduled",
     });
-  }
-  return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          aria-modal="true"
-          role="dialog"
-          className="fixed inset-0 z-[100] flex items-center justify-center"
-          style={{
-            background: isDark
-              ? "rgba(19, 22, 28, 0.75)"
-              : "rgba(224, 229, 236, 0.53)",
-            backdropFilter: "blur(9px)",
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-        >
-          <motion.form
-            ref={dialogRef}
-            className={`relative w-11/12 max-w-md mx-auto p-8 rounded-3xl shadow-2xl
-              border-0 outline-none neumorph-modal
-              ${isDark ? "bg-[#232946ee] text-[#fafafa]" : "bg-[#e0e5ecee] text-[#232946]"}`}
-            style={{
-              boxShadow: isDark
-                ? "0 8px 36px 0 #141824bb, 0 1.5px 3px 0 #232946"
-                : "0 8px 36px 0 #b3bdd7cc, 0 1.5px 3px 0 #e0e5ec",
-              background: isDark ? "rgba(35,41,70,0.95)" : "rgba(224,229,236,0.95)",
-              backdropFilter: "blur(20px)",
-            }}
-            initial={{ scale: 0.94, opacity: 0, y: 40 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.93, opacity: 0, y: 50 }}
-            transition={{ type: "spring", stiffness: 210, damping: 24, duration: 0.35 }}
-            tabIndex={-1}
-            onClick={e => e.stopPropagation()}
-            onSubmit={handleSubmit}
-          >
-            <h3 className="text-xl font-extrabold mb-4 flex items-center gap-2">
-              <span role="img" aria-label="plus">➕</span>
-              New Appointment
-            </h3>
-            <label className="block mb-4 font-semibold relative">
-              <span className="absolute left-3 top-[-0.9rem] px-1 text-xs rounded bg-opacity-60"
-                style={{ background: isDark ? "#232946" : "#e0e5ec", transition: "background 0.2s" }}>
-                Patient ID
-              </span>
-              <input
-                name="patient_id"
-                type="text"
-                required
-                value={form.patient_id}
-                autoFocus
-                onChange={handleChange}
-                className="w-full mt-1 px-3 py-2 rounded-xl bg-transparent border border-[#b3bdd7] focus:border-[#7f5af0] outline-none transition-all"
-                style={{ background: "rgba(255,255,255,0.13)" }}
-                placeholder="Enter patient ID"
-              />
-            </label>
-            <label className="block mb-4 font-semibold relative">
-              <span className="absolute left-3 top-[-0.9rem] px-1 text-xs rounded bg-opacity-60"
-                style={{ background: isDark ? "#232946" : "#e0e5ec", transition: "background 0.2s" }}>
-                Staff ID
-              </span>
-              <input
-                name="staff_id"
-                type="text"
-                required
-                value={form.staff_id}
-                onChange={handleChange}
-                className="w-full mt-1 px-3 py-2 rounded-xl bg-transparent border border-[#b3bdd7] focus:border-[#7f5af0] outline-none transition-all"
-                style={{ background: "rgba(255,255,255,0.13)" }}
-                placeholder="Enter staff ID"
-              />
-            </label>
-            <label className="block mb-4 font-semibold relative">
-              <span className="absolute left-3 top-[-0.9rem] px-1 text-xs rounded bg-opacity-60"
-                style={{ background: isDark ? "#232946" : "#e0e5ec", transition: "background 0.2s" }}>
-                Appointment Type
-              </span>
-              <input
-                name="appointment_type"
-                type="text"
-                required
-                value={form.appointment_type}
-                onChange={handleChange}
-                className="w-full mt-1 px-3 py-2 rounded-xl bg-transparent border border-[#b3bdd7] focus:border-[#7f5af0] outline-none transition-all"
-                style={{ background: "rgba(255,255,255,0.13)" }}
-                placeholder="eg. Consultation, Checkup"
-              />
-            </label>
-            <div className="flex gap-3">
-              <label className="block mb-4 font-semibold flex-1 relative">
-                <span className="absolute left-3 top-[-0.9rem] px-1 text-xs rounded bg-opacity-60"
-                  style={{ background: isDark ? "#232946" : "#e0e5ec", transition: "background 0.2s" }}>
-                  Date
-                </span>
-                <input
-                  name="date"
-                  type="date"
-                  required
-                  value={form.date}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-3 py-2 rounded-xl bg-transparent border border-[#b3bdd7] focus:border-[#7f5af0] outline-none transition-all"
-                  style={{ background: "rgba(255,255,255,0.13)" }}
-                />
-              </label>
-              <label className="block mb-4 font-semibold flex-1 relative">
-                <span className="absolute left-3 top-[-0.9rem] px-1 text-xs rounded bg-opacity-60"
-                  style={{ background: isDark ? "#232946" : "#e0e5ec", transition: "background 0.2s" }}>
-                  Time
-                </span>
-                <input
-                  name="time"
-                  type="time"
-                  required
-                  value={form.time}
-                  onChange={handleChange}
-                  className="w-full mt-1 px-3 py-2 rounded-xl bg-transparent border border-[#b3bdd7] focus:border-[#7f5af0] outline-none transition-all"
-                  style={{ background: "rgba(255,255,255,0.13)" }}
-                />
-              </label>
-            </div>
-            <label className="block mb-4 font-semibold relative">
-              <span className="absolute left-3 top-[-0.9rem] px-1 text-xs rounded bg-opacity-60"
-                style={{ background: isDark ? "#232946" : "#e0e5ec", transition: "background 0.2s" }}>
-                Status
-              </span>
-              <select
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                className="w-full mt-1 px-3 py-2 rounded-xl bg-transparent border border-[#b3bdd7] focus:border-[#7f5af0] outline-none transition-all"
-                style={{ background: "rgba(255,255,255,0.13)" }}
-              >
-                {STATUS_LIST.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </label>
-            <div className="flex mt-3 gap-4 justify-end">
-              <button
-                type="button"
-                className="px-4 py-2 rounded-xl text-base font-semibold bg-[#f1515b22] text-[#f1515b] hover:bg-[#f1515b33] transition"
-                onClick={onClose}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl text-base font-semibold bg-[#7f5af0] text-white hover:bg-[#6356b8] transition"
-              >
-                Add
-              </button>
-            </div>
-          </motion.form>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
+    const [errors, setErrors] = useState({});
+    const dialogRef = useRef();
 
+    useEffect(() => {
+        if (open) {
+            dialogRef.current?.focus();
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => (document.body.style.overflow = "");
+    }, [open]);
+
+    const validateForm = () => {
+        const newErrors = {};
+        if (!form.patient_id) newErrors.patient_id = "Patient ID is required.";
+        if (!form.staff_id) newErrors.staff_id = "Staff ID is required.";
+        if (!form.appointment_type) newErrors.appointment_type = "Appointment Type is required.";
+        if (!form.date) newErrors.date = "Date is required.";
+        if (!form.time) newErrors.time = "Time is required.";
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm(prevForm => ({
+            ...prevForm,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (validateForm()) {
+            onAdd(form);
+            onClose();
+            setForm({
+                patient_id: "",
+                staff_id: "",
+                appointment_type: "",
+                date: "",
+                time: "",
+                status: "Scheduled",
+            });
+            setErrors({});
+        }
+    };
+
+    return (
+        <AnimatePresence>
+            {open && (
+                <motion.div
+                    aria-modal="true"
+                    role="dialog"
+                    className={`${styles.modalOverlay} fixed inset-0 z-[100] flex items-center justify-center`}
+                    onClick={onClose}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                >
+                    <div aria-hidden="true" className={styles.modalOrb} />
+                    <motion.form
+                        ref={dialogRef}
+                        className={`${styles.modalGlass} ${isDark ? styles.dark : styles.light} relative w-11/12 max-w-md mx-auto p-8 rounded-3xl shadow-2xl border-0 outline-none`}
+                        tabIndex={-1}
+                        onClick={(e) => e.stopPropagation()}
+                        onSubmit={handleSubmit}
+                        initial={{ scale: 0.92, opacity: 0, y: 60 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.93, opacity: 0, y: 50 }}
+                        transition={{ type: "spring", stiffness: 210, damping: 24, duration: 0.35 }}
+                    >
+                        <div aria-hidden="true" className={styles.noiseOverlay} />
+                        <button
+                            type="button"
+                            aria-label="Close"
+                            className={styles.closeBtn}
+                            onClick={onClose}
+                            tabIndex={0}
+                        >
+                            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                                <circle cx="11" cy="11" r="10" fill="none" />
+                                <path d="M15 7L7 15M7 7l8 8" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
+                            </svg>
+                        </button>
+
+                        <h3 className={styles.modalTitle}>
+                            <span role="img" aria-label="plus">➕</span> New Appointment
+                        </h3>
+
+                        {["patient_id", "staff_id", "appointment_type"].map((field, index) => (
+                            <label key={index} className={styles.formLabel}>
+                                <span>{field.replace("_", " ").toUpperCase()}</span>
+                                <input
+                                    name={field}
+                                    type="text"
+                                    required
+                                    value={form[field]}
+                                    onChange={handleChange}
+                                    className={`${styles.formInput} ${errors[field] ? 'border-red-500' : ''}`}
+                                    placeholder={`Enter ${field.replace("_", " ")}`}
+                                />
+                                {errors[field] && <span className="text-red-500 text-sm">{errors[field]}</span>}
+                            </label>
+                        ))}
+
+                        <div className={styles.row}>
+                            <label className={styles.formLabel}>
+                                <span>Date</span>
+                                <input
+                                    name="date"
+                                    type="date"
+                                    required
+                                    value={form.date}
+                                    onChange={handleChange}
+                                    className={`${styles.formInput} ${errors.date ? 'border-red-500' : ''}`}
+                                />
+                                {errors.date && <span className="text-red-500 text-sm">{errors.date}</span>}
+                            </label>
+                            <label className={styles.formLabel}>
+                                <span>Time</span>
+                                <input
+                                    name="time"
+                                    type="time"
+                                    required
+                                    value={form.time}
+                                    onChange={handleChange}
+                                    className={`${styles.formInput} ${errors.time ? 'border-red-500' : ''}`}
+                                />
+                                {errors.time && <span className="text-red-500 text-sm">{errors.time}</span>}
+                            </label>
+                        </div>
+
+                        <label className={styles.formLabel}>
+                            <span>Status</span>
+                            <select
+                                name="status"
+                                value={form.status}
+                                onChange={handleChange}
+                                className={styles.formInput}
+                            >
+                                {STATUS_LIST.map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                        </label>
+
+                        <div className={styles.actions}>
+                            <button
+                                type="button"
+                                className={styles.cancelBtn}
+                                onClick={onClose}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className={styles.submitBtn}
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </motion.form>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+}
 // ---- MAIN COMPONENT ----
 export default function Appointments() {
   const [query, setQuery] = useState("");
@@ -523,11 +384,34 @@ export default function Appointments() {
       : false
   );
   const [showModal, setShowModal] = useState(false);
-  const [appointments, setAppointments] = useState(initialAppointments);
 
+
+  const [appointments, setAppointments] = useState([]);
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await fetch(`${URL}/appointment/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+      setAppointments(result); // Set the fetched data to state
+      console.log("Fetched appointments:", result);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
+  };
 
   // Listen for theme changes
   useEffect(() => {
+    fetchAppointments();
     const checkTheme = () => {
       setIsDark(
         document.body.getAttribute("data-theme") === "dark" ||
@@ -539,6 +423,10 @@ export default function Appointments() {
     observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-theme"] });
     return () => observer.disconnect();
   }, []);
+
+
+
+
 
 
 
@@ -572,7 +460,8 @@ export default function Appointments() {
 
 
     // --- FILTER COUNTS ---
-  const summaryCounts = useMemo(() => {
+
+    const summaryCounts = useMemo(() => {
     const counts = { All: appointments.length };
     STATUS_LIST.forEach(status => counts[status] = 0);
     appointments.forEach(a => {
@@ -603,140 +492,177 @@ export default function Appointments() {
 
 
 return (
-    <section
-      className="patients-wrap relative px-1 md:px-4 py-4 sm:py-7 min-h-screen overflow-x-hidden"
+  <section
+    className="patients-wrap relative px-1 md:px-4 py-4 sm:py-7 min-h-screen overflow-x-hidden"
+    style={{
+      background: isDark ? auroraGradDark : auroraGradLight,
+      transition: "background 0.5s",
+      borderRadius: "1.2rem",
+      position: "relative",
+      zIndex: 0,
+    }}
+  >
+    {/* --- Animated Aurora Orbs (Background) --- */}
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 w-full h-full overflow-hidden"
+      style={{ zIndex: 0, borderRadius: "1.2rem" }}
+    >
+      {/* Animated Orbs */}
+      <div className="absolute left-1/3 top-1/5 w-80 h-80 bg-gradient-to-br from-purple-300/70 to-indigo-400/60 blur-3xl animate-float-slow rounded-full opacity-40 dark:from-purple-900/50 dark:to-indigo-900/40" />
+      <div className="absolute right-20 bottom-10 w-72 h-72 bg-gradient-to-tr from-pink-200/60 to-blue-300/40 blur-2xl animate-float-reverse rounded-full opacity-30 dark:from-pink-700/40 dark:to-blue-800/30" />
+      <div className="absolute left-7 bottom-24 w-40 h-40 bg-gradient-to-br from-green-200/50 to-teal-300/40 blur-2xl animate-float rounded-full opacity-30 dark:from-green-900/40 dark:to-teal-900/30" />
+    </div>
+    {/* --- Subtle Noise Overlay --- */}
+    <div
       style={{
-        background: isDark ? auroraGradDark : auroraGradLight,
-        transition: "background 0.5s",
+        pointerEvents: "none",
+        zIndex: 2,
+        position: "absolute",
+        inset: 0,
+        background: "url('https://www.transparenttextures.com/patterns/noise.png') repeat",
+        opacity: isDark ? 0.13 : 0.08,
+        mixBlendMode: "overlay",
         borderRadius: "1.2rem",
       }}
-    >
-      {/* Subtle noise overlay */}
-      <div
-        style={{
-          pointerEvents: "none",
-          zIndex: 1,
-          position: "absolute",
-          inset: 0,
-          background: "url('https://www.transparenttextures.com/patterns/noise.png') repeat",
-          opacity: isDark ? 0.13 : 0.08,
-          mixBlendMode: "overlay",
-          borderRadius: "1.2rem",
-        }}
-        aria-hidden="true"
-      />
+      aria-hidden="true"
+    />
 
-      {/* Dashboard summary cards */}
-      <DashboardSummary data={appointments} isDark={isDark} />
+    {/* --- FILTER BAR --- */}
+<nav
+  aria-label="Appointment Filters"
+  className="w-full sticky top-0 left-0 z-30 flex items-center overflow-x-auto scrollbar-none mb-6 backdrop-blur-md"
+  style={{
+    paddingBottom: 4,
+    background: isDark ? "rgba(35,41,70,0.61)" : "rgba(255,255,255,0.67)",
+    borderRadius: "1.1rem",
+    boxShadow: isDark
+      ? "0 2px 10px 0 #23294655"
+      : "0 2px 10px 0 #e0e5ec44",
+    border: `1.5px solid ${isDark ? "#23294677" : "#e0e5ecaa"}`,
+    transition: "background 0.5s, box-shadow 0.3s",
+  }}
+>
+  <ul className="flex gap-2 md:gap-4 w-full px-1 sm:px-0 overflow-x-auto scrollbar-none flex-row">
+    {FILTERS.map(({ key, icon, label }, idx) => {
+      const active = key === statusFilter;
+      return (
+        <motion.li
+          key={key}
+          className="list-none"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.09 + idx * 0.04, duration: 0.33, type: "spring", stiffness: 220 }}
+        >
+          <button
+            type="button"
+            aria-pressed={active}
+            tabIndex={0}
+            className={`flex items-center gap-2 px-3 py-2 sm:px-4 rounded-2xl border text-base font-semibold shadow-lg transition-all duration-200
+              ${active
+                ? "bg-gradient-to-tr from-[#7f5af0ee] to-[#4d2ccfcc] text-white border-[#7f5af0] shadow-purple-400/40"
+                : isDark
+                  ? "bg-[#232946cc] text-[#fafafa] border-[#232946] shadow-[#181b23]/30"
+                  : "bg-[#e0e5ecbb] text-[#232946] border-[#e0e5ec] shadow-[#b3bdd7]/30"
+              }
+              hover:scale-105 active:scale-97 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7f5af0] cursor-pointer
+            `}
+            style={{
+              backdropFilter: "blur(8px)",
+              borderWidth: 1.5,
+              boxShadow: active
+                ? "0 1.5px 12px 0 #7f5af044"
+                : "0 1.5px 8px 0 #b3bdd744",
+              minWidth: 96,
+              flexDirection: "row",
+            }}
+            onClick={() => setStatusFilter(key)}
+            onKeyDown={e => {
+              if (["Enter", " "].includes(e.key)) setStatusFilter(key);
+            }}
+          >
+            <span
+              className="text-lg transition-colors"
+              style={{
+                color: active ? "#fff" : isDark ? "#7f5af0" : "#6457a6",
+                filter: active ? "drop-shadow(0 2px 4px #7f5af044)" : "none"
+              }}
+            >{icon}</span>
+            <span className="hidden sm:inline">{label}</span>
+            <span
+              className={`ml-1 min-w-[1.2em] rounded-lg px-2 py-0.5 text-xs font-bold
+                ${active
+                  ? "bg-white/20 text-white"
+                  : "bg-black/10 text-inherit"
+                }
+                transition-colors`}
+              style={{
+                boxShadow: active ? "0 1px 8px #fff2" : "none",
+              }}
+            >
+              {summaryCounts[key] ?? 0}
+            </span>
+          </button>
+        </motion.li>
+      );
+    })}
+  </ul>
+</nav>
 
-      {/* ------- FILTER BAR ADDED HERE -------- */}
-      <nav
-        aria-label="Appointment Filters"
-        className="w-full sticky top-0 left-0 z-20 flex items-center overflow-x-auto scrollbar-none mb-6"
+    {/* --- Header + Search --- */}
+    <header className="patients-header mb-6 flex flex-col md:flex-row gap-2 md:items-center md:justify-between z-20 relative">
+      <h2 className="font-extrabold text-2xl flex items-center drop-shadow">
+        <span
+          role="img"
+          aria-label="calendar"
+          className="mr-2"
+          style={{
+            filter: isDark
+              ? "drop-shadow(0 1px 6px #7f5af0aa)"
+              : "drop-shadow(0 1px 6px #b3bdd788)"
+          }}
+        >📅</span>
+        <span className="bg-gradient-to-tr from-[#7f5af0] to-[#6457a6] bg-clip-text text-transparent">
+          Appointments
+        </span>
+      </h2>
+      <form
+        className="search-bar relative flex items-center gap-2 rounded-2xl px-3 py-2 shadow-lg transition-colors focus-within:ring-2 focus-within:ring-[#7f5af0] bg-white/80 dark:bg-[#1a1f2b]/80"
+        role="search"
+        aria-label="Search Appointments"
+        onSubmit={e => e.preventDefault()}
         style={{
-          paddingBottom: 4,
-          background: "transparent",
+          border: `1.5px solid ${isDark ? "#23294688" : "#e0e5ecbb"}`,
+          boxShadow: isDark
+            ? "0 1.5px 8px #1a1f2b55"
+            : "0 1.5px 8px #e0e5ec77",
+          backdropFilter: "blur(6px)",
         }}
       >
-        <ul className="flex gap-2 md:gap-4 w-full px-1 sm:px-0 overflow-x-auto scrollbar-none">
-          {FILTERS.map(({ key, icon, label }, idx) => {
-            const active = key === statusFilter;
-            return (
-              <motion.li
-                key={key}
-                className="list-none"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.09 + idx * 0.04, duration: 0.33 }}
-              >
-                <button
-                  type="button"
-                  aria-pressed={active}
-                  tabIndex={0}
-                  className={`flex items-center gap-2 px-3 py-2 sm:px-4 rounded-2xl border text-base font-semibold shadow-lg transition-all
-                    ${active
-                      ? isDark
-                        ? "bg-[#7f5af0ee] text-white border-[#7f5af0]"
-                        : "bg-[#7f5af0ee] text-white border-[#7f5af0]"
-                      : isDark
-                        ? "bg-[#232946cc] text-[#fafafa] border-[#232946]"
-                        : "bg-[#e0e5ecbb] text-[#232946] border-[#e0e5ec]"
-                    }
-                    hover:scale-105 active:scale-97 outline-none focus:ring-2 focus:ring-[#7f5af0] cursor-pointer
-                    `}
-                  style={{
-                    backdropFilter: "blur(8px)",
-                    borderWidth: 1.5,
-                    boxShadow: active
-                      ? "0 1.5px 12px 0 #7f5af044"
-                      : "0 1.5px 8px 0 #b3bdd744",
-                    minWidth: 96,
-                  }}
-                  onClick={() => setStatusFilter(key)}
-                  onKeyDown={e => {
-                    if (["Enter", " "].includes(e.key)) setStatusFilter(key);
-                  }}
-                >
-                  <span className="text-lg">{icon}</span>
-                  <span className="hidden sm:inline">{label}</span>
-                  <span
-                    className={`ml-1 min-w-[1.2em] rounded-lg px-2 py-0.5 text-xs font-bold
-                      ${active
-                        ? "bg-white/20 text-white"
-                        : "bg-black/10 text-inherit"
-                      }`}
-                  >
-                    {summaryCounts[key] ?? 0}
-                  </span>
-                </button>
-              </motion.li>
-            );
-          })}
-        </ul>
-      </nav>
-      {/* -------------------------------------- */}
+        <SearchIcon dark={isDark} />
+        <input
+          ref={inputRef}
+          type="search"
+          autoComplete="off"
+          aria-label="Search appointments"
+          placeholder="Search…"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          className="transition-colors bg-transparent outline-none ml-2 text-base placeholder:text-gray-400 dark:placeholder:text-gray-400/70 font-medium"
+          style={{
+            minWidth: 110,
+            color: isDark ? "#fafafa" : "#232946",
+          }}
+        />
+      </form>
+    </header>
 
-      {/* Header + Search */}
-      <header className="patients-header mb-6 flex flex-col md:flex-row gap-2 md:items-center md:justify-between z-10 relative">
-        <h2 className="font-extrabold text-2xl flex items-center drop-shadow">
-          <span role="img" aria-label="calendar" className="mr-2">📅</span>
-          Appointments
-        </h2>
-        <form
-          className="search-bar relative flex items-center gap-2 rounded-2xl px-3 py-2 shadow bg-white/80 dark:bg-[#1a1f2b]/80 transition-colors"
-          role="search"
-          aria-label="Search Appointments"
-          onSubmit={e => e.preventDefault()}
-        >
-          <SearchIcon dark={isDark} />
-          <input
-            ref={inputRef}
-            type="search"
-            autoComplete="off"
-            aria-label="Search appointments"
-            placeholder="Search…"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            className="transition-colors bg-transparent outline-none ml-2 text-base"
-            style={{ minWidth: 110 }}
-          />
-        </form>
-      </header>
-
-      {/* Table (Desktop) */}
-      <div className="patients-table-outer hidden md:block relative z-10">
+    {/* --- Table (Desktop) --- */}
+    <div className="patients-table-outer hidden md:block relative z-10">
         <table
           className="patients-table rounded-2xl overflow-hidden"
           role="table"
           aria-label="Appointments"
-          style={{
-            background: isDark ? "rgba(35,41,70,0.87)" : "rgba(255,255,255,0.93)",
-            backdropFilter: "blur(5px)",
-            borderRadius: "1.1rem",
-            boxShadow: isDark
-              ? "0 2.5px 13px 0 #181b23aa, 0 1.5px 3px 0 #232946"
-              : "0 2.5px 13px 0 #e0e5ec88, 0 1.5px 3px 0 #b3bdd7"
-          }}
         >
           <thead>
             <tr>
@@ -772,12 +698,16 @@ return (
         </table>
       </div>
 
-      {/* Cards (Mobile) */}
+      {/* --- Cards (Mobile) --- */}
       <div className="patients-cards block md:hidden z-10">
         <AnimatePresence>
           {filtered.length === 0 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="empty text-center py-6 text-lg opacity-60">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="empty text-center py-6 text-lg opacity-60"
+            >
               <span role="img" aria-label="empty">🕳️</span> No appointments found.
             </motion.div>
           )}
@@ -793,19 +723,53 @@ return (
         </AnimatePresence>
       </div>
 
-      {/* Floating Add Button */}
-      <FloatingAddButton
-        onClick={() => setShowModal(true)}
-        isDark={isDark}
-      />
 
-      {/* Add Appointment Modal */}
-      <AddAppointmentModal
-        open={showModal}
-        onClose={() => setShowModal(false)}
-        onAdd={handleAddAppointment}
-        isDark={isDark}
-      />
-    </section>
-  );
+    {/* --- Cards (Mobile) --- */}
+    <div className="patients-cards block md:hidden z-10">
+      <AnimatePresence>
+        {filtered.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="empty text-center py-6 text-lg opacity-60"
+          >
+            <span role="img" aria-label="empty">🕳️</span> No appointments found.
+          </motion.div>
+        )}
+        {filtered.map((appt, i) => (
+          <AppointmentCard
+            key={appt.appointment_id}
+            appt={appt}
+            tabIndex={0}
+            onKeyDown={e => onKeyDownRows(e, i)}
+            aria-selected={focusIdx === i}
+          />
+        ))}
+      </AnimatePresence>
+    </div>
+
+    {/* --- Floating Add Button --- */}
+    <FloatingAddButton
+      onClick={() => setShowModal(true)}
+      isDark={isDark}
+    />
+
+    {/* --- Add Appointment Modal --- */}
+    <AddAppointmentModal
+      open={showModal}
+      onClose={() => setShowModal(false)}
+      onAdd={handleAddAppointment}
+      isDark={isDark}
+    />
+
+    {/* --- Accessibility & Visual Focus Aids --- */}
+    {/* <span className="sr-only" aria-live="polite">
+      {filtered.length === 0
+        ? "No appointments found."
+        : `${filtered.length} appointments shown.`}
+    </span> */}
+  </section>
+);
+
 }

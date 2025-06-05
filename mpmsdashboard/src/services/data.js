@@ -11,6 +11,8 @@ export const staff = [
 
 export const appointments = [
   { appointment_id: 1, patient_id: 1, staff_id: 1, appointment_type: "Antenatal", date: "2023-06-01", time: "10:00", status: "Scheduled" },
+  { appointment_id: 2, patient_id: 2, staff_id: 2, appointment_type: "Antenatal", date: "2023-06-01", time: "10:00", status: "Scheduled" },
+  { appointment_id: 3, patient_id: 3, staff_id: 3, appointment_type: "Antenatal", date: "2023-06-01", time: "10:00", status: "Pending" },
 ];
 
 export const deliveries = [
