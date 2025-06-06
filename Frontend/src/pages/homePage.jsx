@@ -149,7 +149,7 @@ const HomePage = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/register" className="hover:text-white">
+                <Link to="/signup" className="hover:text-white">
                   Register
                 </Link>
               </li>
@@ -163,10 +163,10 @@ const HomePage = () => {
           <div>
             <h4 className="font-semibold mb-4">Connect With Us</h4>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-white-400 hover:text-white">
                 <i className="fab fa-facebook"></i>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-white-400 hover:text-blue">
                 <i className="fab fa-twitter"></i>
               </a>
               <a href="#" className="text-gray-400 hover:text-white">

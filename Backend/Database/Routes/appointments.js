@@ -13,7 +13,6 @@ appointmentRouter.post('/', async (req, res, next) => {
       appointment_category,
       appointment_state,
       payment_status,
-      due,
       status,
       date,
       date_created
@@ -26,7 +25,6 @@ appointmentRouter.post('/', async (req, res, next) => {
       appointment_category,
       appointment_state,
       payment_status,
-      due,
       status,
       date,
       date_created

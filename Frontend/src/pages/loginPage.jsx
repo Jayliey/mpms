@@ -88,27 +88,33 @@ export default function Login() {
     setPassword("");
   };
 
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    setError("");
-    if (role === "patient" && !userId) {
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+
+  // Validate inputs based on role
+  if (role === "patient") {
+    if (!userId) {
       setError("Please enter your ID number.");
       return;
-    }else{
-      await fetchPatient()
     }
-    if ((role === "nurse" || role === "doctor") && (!email || !password)) {
+    await fetchPatient();
+  } else if (role === "nurse" || role === "doctor") {
+    if (!email || !password) {
       setError("Please fill in all fields.");
       return;
-    }else{
-      await fetchStaff();
     }
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert("Logged in! (demo)");
-    }, 1200);
-  };
+    await fetchStaff();
+  }
+
+  setLoading(true);
+  
+  // Simulate a login process
+  setTimeout(() => {
+    setLoading(false);
+    alert("Logged in! (demo)");
+  }, 1200);
+};
 
 
 const fetchPatient = async() => {
@@ -127,7 +133,7 @@ const fetchPatient = async() => {
           // Successful login logic here
           await Swal.fire('Success!', 'You have logged in successfully!', 'success');
           // onLogin(); // Call your login function to update state
-          navigate("/dashboard"); // Uncomment to navigate to dashboard
+          navigate("/patient_home"); // Uncomment to navigate to dashboard
         } else {
           await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
         }
@@ -381,6 +387,17 @@ const fetchStaff = async() => {
                   className="font-medium text-blue-600 dark:text-teal-300 hover:underline"
                 >
                   Sign up
+                </a>
+              </div>
+              <div className="text-center text-sm mt-4">
+                <span className="text-neutral-600 dark:text-neutral-400">
+                  Staff Member?{" "}
+                </span>
+                <a
+                  href="/signup_staff"
+                  className="font-medium text-blue-600 dark:text-teal-300 hover:underline"
+                >
+                  Activate
                 </a>
               </div>
             </form>
