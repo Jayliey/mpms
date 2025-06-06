@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   return (
@@ -13,21 +13,25 @@ const HomePage = () => {
                 Welcome to Mahusekwa Maternity Care
               </h1>
               <p className="text-lg mb-8">
-                Your trusted partner for safe pregnancy, delivery, and postnatal care. 
-                Experience compassionate care with our modern facilities and expert team.
+                Your trusted partner for safe pregnancy, delivery, and postnatal
+                care. Experience compassionate care with our modern facilities
+                and expert team.
               </p>
-              <Link 
-                to="/register"
-                className="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-              >
+              <Link
+                to="/signup"
+                className="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                 Register Now
               </Link>
             </div>
             <div className="md:w-1/2 flex justify-center">
-              <img 
-                src="/images/maternity-hero.png" 
-                alt="Happy mother and baby"
-                className="w-80 h-80 object-contain"
+              <img
+                src="https://images.pexels.com/photos/32386175/pexels-photo-32386175/free-photo-of-adorable-baby-smiling-in-diaper-on-soft-blanket.jpeg?auto=compress&cs=tinysrgb&w=600"
+                alt="Newborn baby"
+                className="w-80 h-90 object-contain"
+                style={{
+                  borderRadius: "8px", // Adjust the radius as needed
+                  border: "1px solid white", // White border color
+                }}
               />
             </div>
           </div>
@@ -41,17 +45,17 @@ const HomePage = () => {
             Our Maternity Services
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <FeatureCard 
+            <FeatureCard
               icon="🤰"
               title="Prenatal Care"
               description="Regular checkups, ultrasound scans, and personalized care plans for healthy pregnancies"
             />
-            <FeatureCard 
+            <FeatureCard
               icon="👶"
               title="Safe Delivery"
               description="24/7 delivery services with modern facilities and experienced midwives"
             />
-            <FeatureCard 
+            <FeatureCard
               icon="❤"
               title="Postnatal Support"
               description="Newborn care guidance, breastfeeding support, and maternal health monitoring"
@@ -67,17 +71,17 @@ const HomePage = () => {
             Get Started in 3 Simple Steps
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <StepCard 
+            <StepCard
               number="1"
               title="Register"
               description="Create your secure patient account online"
             />
-            <StepCard 
+            <StepCard
               number="2"
               title="Book Appointment"
               description="Schedule your prenatal checkups easily"
             />
-            <StepCard 
+            <StepCard
               number="3"
               title="Track Progress"
               description="Access your medical records anytime"
@@ -96,7 +100,9 @@ const HomePage = () => {
             For urgent maternity care, contact our emergency team immediately
           </p>
           <div className="flex flex-col md:flex-row justify-center items-center gap-6">
-            <a href="tel:+263123456789" className="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+            <a
+              href="tel:+263123456789"
+              className="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
               Call Emergency: +263 123 456 789
             </a>
           </div>
@@ -109,24 +115,49 @@ const HomePage = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">Mahusekwa Hospital</h3>
             <p className="text-gray-400">
-              Mashonaland East Province<br/>
+              Mashonaland East Province
+              <br />
               Marondera District, Zimbabwe
             </p>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link to="/about" className="hover:text-white">About Us</Link></li>
-              <li><Link to="/services" className="hover:text-white">Services</Link></li>
-              <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
+              <li>
+                <Link to="/about" className="hover:text-white">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/services" className="hover:text-white">
+                  Services
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-white">
+                  Contact
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Patient Portal</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link to="/login" className="hover:text-white">Login</Link></li>
-              <li><Link to="/register" className="hover:text-white">Register</Link></li>
-              <li><Link to="/faq" className="hover:text-white">FAQ</Link></li>
+              <li>
+                <Link to="/login" className="hover:text-white">
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link to="/register" className="hover:text-white">
+                  Register
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-white">
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

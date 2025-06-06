@@ -154,7 +154,7 @@ const fetchStaff = async() => {
           // Successful login logic here
           await Swal.fire('Success!', 'You have logged in successfully!', 'success');
           // onLogin(); // Call your login function to update state
-          navigate("/dashboard"); // Uncomment to navigate to dashboard
+          navigate("/home"); // Uncomment to navigate to dashboard
         } else {
           await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
         }
