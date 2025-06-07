@@ -122,11 +122,12 @@ const PatientHome = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-900">Maternity Dashboard</h1>
+        <h1 className="text-3xl font-bold text-blue-900">
+          Maternity Dashboard
+        </h1>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
           + Schedule Appointment
         </button>
       </div>
@@ -160,8 +161,7 @@ const PatientHome = () => {
           {pendingPayments.map((payment) => (
             <div
               key={payment.id}
-              className="flex justify-between p-3 hover:bg-gray-50 rounded"
-            >
+              className="flex justify-between p-3 hover:bg-gray-50 rounded">
               <div>
                 <h3 className="font-medium">{payment.name}</h3>
                 <p className="text-sm text-gray-500">Due: {payment.dueDate}</p>
@@ -203,7 +203,7 @@ const PatientHome = () => {
       </div>
 
       <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
-        <QuickAction title="Schedule Appointment" icon="➕" link="#" />
+        <QuickAction title="Profile" icon="👤" link="/patient_profile" />
         <QuickAction title="View Reports" icon="📊" link="/reports" />
         <QuickAction title="Payment Records" icon="💳" link="/payments" />
       </div>
@@ -248,8 +248,7 @@ const PatientHome = () => {
                     ...formData,
                     appointment_category: e.target.value,
                   })
-                }
-              >
+                }>
                 <option value="">Select Category</option>
                 <option value="lab">Lab</option>
                 <option value="maternity">Maternity</option>
@@ -263,8 +262,7 @@ const PatientHome = () => {
                     ...formData,
                     appointment_state: e.target.value,
                   })
-                }
-              >
+                }>
                 <option value="">Select State</option>
                 <option value="normal">Normal</option>
                 <option value="emergency">Emergency</option>
@@ -282,14 +280,12 @@ const PatientHome = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border rounded"
-                >
+                  className="px-4 py-2 border rounded">
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                   Submit
                 </button>
               </div>
@@ -316,8 +312,7 @@ const StatCard = ({ title, value, icon, color }) => (
 const QuickAction = ({ title, icon, link }) => (
   <Link
     to={link}
-    className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow"
-  >
+    className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
     <div className="text-center">
       <span className="text-3xl block mb-2">{icon}</span>
       <p className="text-sm font-medium text-gray-700">{title}</p>

@@ -13,10 +13,12 @@ const staffRouter = require("./Database/Routes/staff");
 const roleRouter = require("./Database/Routes/roles");
 const appointmentRouter = require("./Database/Routes/appointments");
 const getWayRoute = require("./paynow/getWay")
+const medicationRouter = require("./Database/Routes/medication"); // update path as needed
+
 
 const corsOptions = {
   origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type"],
 };
 
@@ -32,6 +34,7 @@ app.use("/staff", staffRouter);
 app.use("/role", roleRouter);
 app.use("/appointment", appointmentRouter);
 app.use("/payment", getWayRoute);
+app.use("/medication", medicationRouter);
 
 /////////////////
 

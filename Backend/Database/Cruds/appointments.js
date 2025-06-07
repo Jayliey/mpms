@@ -8,13 +8,14 @@ crudsObj.postAppointment = appointment => {
   return new Promise((resolve, reject) => {
     console.log('honai appointment:', appointment);
     pool.query(
-      `INSERT INTO appointments (patient_id, staff_id, description, appointment_category, appointment_state, payment_status, status, date, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO appointments (patient_id, staff_id, description, appointment_category, appointment_state, cost, payment_status, status, date, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         appointment.patient_id, 
         appointment.staff_id,
         appointment.description,
         appointment.appointment_category,
         appointment.appointment_state,
+        appointment.cost,
         appointment.payment_status,
         appointment.status,
         appointment.date,
@@ -64,6 +65,7 @@ crudsObj.updateAppointment = (appointmentId, updatedValues) => {
         description = ?, 
         appointment_category = ?, 
         appointment_state = ?, 
+        cost = ?,
         payment_status = ?, 
         status = ?, 
         date = ? 
@@ -73,6 +75,7 @@ crudsObj.updateAppointment = (appointmentId, updatedValues) => {
         updatedValues.description,
         updatedValues.appointment_category,
         updatedValues.appointment_state,
+        updatedValues.cost,
         updatedValues.payment_status,
         updatedValues.status,
         updatedValues.date,

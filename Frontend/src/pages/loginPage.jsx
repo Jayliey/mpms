@@ -117,31 +117,35 @@ const handleSubmit = async (e) => {
 };
 
 
-const fetchPatient = async() => {
-         try {
-        console.log("Logging in with:", userId);
-        const response = await fetch(`${API}/patient/login/${userId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+const fetchPatient = async () => {
+  try {
+    console.log("Logging in with:", userId);
+    const response = await fetch(`${API}/patient/login/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-        const result = await response.json();
+    const result = await response.json();
 
-        if (response.ok && result) {
-          // Successful login logic here
-          await Swal.fire('Success!', 'You have logged in successfully!', 'success');
-          // onLogin(); // Call your login function to update state
-          navigate("/patient_home"); // Uncomment to navigate to dashboard
-        } else {
-          await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
-        }
-      } catch (error) {
-        console.log("Error", error);
-        await Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
-      }
-}
+    if (response.ok && result) {
+      console.log("patient", result);
+      localStorage.setItem("patient", JSON.stringify(result));
+
+      await Swal.fire('Success!', 'You have logged in successfully!', 'success');
+
+      // onLogin(); // Call your login function to update state
+      navigate("/patient_home");
+    } else {
+      await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
+    }
+  } catch (error) {
+    console.log("Error", error);
+    await Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
+  }
+};
+
 
 
 const fetchStaff = async() => {

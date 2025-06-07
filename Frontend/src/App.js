@@ -5,6 +5,8 @@ import DashboardPage from './pages/dashboardPage';
 import HomePage from './pages/homePage'
 import StaffActivation from './pages/activateAccount';
 import PatientHome from './components/patient/landingView';
+import PatientProfile from './components/patient/patientDetails';
+import PatientMedications from './components/patient/medication';
 
 function App() {
   return (
@@ -14,7 +16,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/patient_home" element={<PatientHome />} />
+        <Route path="/patient_profile" element={<PatientProfile />} />
         <Route path="/signup_staff" element={<StaffActivation />} />
+        <Route path="/reports" element={<PatientMedications />} />
         <Route path="/" element={<HomePage />} />
       </Routes>
     </Router>
