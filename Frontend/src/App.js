@@ -7,6 +7,7 @@ import StaffActivation from './pages/activateAccount';
 import PatientHome from './components/patient/landingView';
 import PatientProfile from './components/patient/patientDetails';
 import PatientMedications from './components/patient/medication';
+import PaymentHistory from './components/patient/paymentRecords';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/patient_profile" element={<PatientProfile />} />
         <Route path="/signup_staff" element={<StaffActivation />} />
         <Route path="/reports" element={<PatientMedications />} />
+        <Route path="/payment_records" element={<PaymentHistory />} />
         <Route path="/" element={<HomePage />} />
       </Routes>
     </Router>

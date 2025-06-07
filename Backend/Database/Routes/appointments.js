@@ -53,6 +53,44 @@ appointmentRouter.get('/', async (req, res, next) => {
   }
 })
 
+appointmentRouter.get('/patient/:id/:status', async (req, res, next) => {
+  try {
+    const patientId = req.params.id
+    const status = req.params.status
+    const appointment = await appointmentsDbOperations.getAppointmentByPatientIdStatus(
+      patientId,
+      status
+    )
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'appointment not found' })
+    }
+console.log("app", appointment)
+    res.json(appointment)
+  } catch (error) {
+    console.error(error)
+    res.sendStatus(500)
+  }
+})
+
+appointmentRouter.get('/patient/:id', async (req, res, next) => {
+  try {
+    const patientId = req.params.id
+    const appointment = await appointmentsDbOperations.getAppointmentByPatientId(
+      patientId
+    )
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'appointment not found' })
+    }
+
+    res.json(appointment)
+  } catch (error) {
+    console.error(error)
+    res.sendStatus(500)
+  }
+})
+
 appointmentRouter.get('/:id', async (req, res, next) => {
   try {
     const appointmentId = req.params.id

@@ -12,12 +12,21 @@ const PatientHome = () => {
   const [pendingPayments, setPendingPayments] = useState([]);
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [ecoCashNumber, setEcoCashNumber] = useState("");
+
+  const storedData = JSON.parse(localStorage.getItem("patient"));
+  const patient = Array.isArray(storedData) ? storedData[0] : storedData;
+
   const [formData, setFormData] = useState({
     patient_id: "",
     staff_id: "",
     description: "",
     appointment_category: "",
     appointment_state: "",
+    cost: "",
     payment_status: "",
     status: "Pending",
     date: "",
@@ -26,14 +35,15 @@ const PatientHome = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch("http://localhost:3001/appointment/", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
+        const response = await fetch(
+          `http://localhost:3001/appointment/patient/${patient.patient_id}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
         const result = await response.json();
-        console.log("Appointments:", result);
-
         const now = new Date();
 
         const totalVisits = result.length;
@@ -55,7 +65,9 @@ const PatientHome = () => {
             id: appt.appointment_id,
             staff: `Staff ${appt.staff_id}`,
             date: new Date(appt.date).toLocaleString(),
-            type: appt.description || appt.appointment_category,
+            description: appt.description,
+            type: appt.appointment_category,
+            raw: appt,
           }))
         );
 
@@ -63,7 +75,7 @@ const PatientHome = () => {
           pending.map((appt) => ({
             id: appt.appointment_id,
             name: appt.description || "No description",
-            amount: 20, // Placeholder: replace with actual amount if needed
+            amount: appt.cost,
             dueDate: new Date(appt.date).toISOString().split("T")[0],
           }))
         );
@@ -119,11 +131,31 @@ const PatientHome = () => {
     }
   };
 
+  const handlePayClick = (payment) => {
+    setSelectedPayment(payment);
+    setPaymentMethod("");
+    setEcoCashNumber("");
+  };
+
+  const confirmPayment = () => {
+    if (paymentMethod === "ecocash" && !ecoCashNumber) {
+      return Swal.fire("Error", "Please enter your EcoCash number.", "error");
+    }
+
+    Swal.fire("Success", "Payment successful.", "success").then(() => {
+      setSelectedPayment(null);
+    });
+  };
+
+  const handleAppointmentClick = (appt) => {
+    setSelectedAppointment(appt);
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-blue-900">
-          Maternity Dashboard
+          Hello {patient.name}
         </h1>
         <button
           onClick={() => setShowModal(true)}
@@ -146,7 +178,7 @@ const PatientHome = () => {
           color="bg-green-100"
         />
         <StatCard
-          title="Recent Payments"
+          title="Total Payments"
           value={stats.recentPayments}
           icon="💵"
           color="bg-purple-100"
@@ -158,19 +190,26 @@ const PatientHome = () => {
           <h2 className="text-xl font-semibold mb-4 text-gray-700">
             Pending Payments
           </h2>
-          {pendingPayments.map((payment) => (
-            <div
-              key={payment.id}
-              className="flex justify-between p-3 hover:bg-gray-50 rounded">
-              <div>
-                <h3 className="font-medium">{payment.name}</h3>
-                <p className="text-sm text-gray-500">Due: {payment.dueDate}</p>
+          {pendingPayments.length === 0 ? (
+            <p className="text-gray-500 text-sm">No payments pending.</p>
+          ) : (
+            pendingPayments.map((payment) => (
+              <div
+                key={payment.id}
+                className="flex justify-between p-3 hover:bg-gray-50 rounded cursor-pointer"
+                onClick={() => handlePayClick(payment)}>
+                <div>
+                  <h3 className="font-medium">{payment.name}</h3>
+                  <p className="text-sm text-gray-500">
+                    Due: {payment.dueDate}
+                  </p>
+                </div>
+                <span className="text-sm text-red-600 font-semibold">
+                  ${payment.amount}
+                </span>
               </div>
-              <span className="text-sm text-red-600 font-semibold">
-                ${payment.amount}
-              </span>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -186,17 +225,30 @@ const PatientHome = () => {
               </tr>
             </thead>
             <tbody>
-              {upcomingAppointments.map((appt) => (
-                <tr key={appt.id} className="border-b hover:bg-gray-50">
-                  <td className="py-3">{appt.staff}</td>
-                  <td className="py-3">{appt.date}</td>
-                  <td className="py-3">
-                    <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
-                      {appt.type}
-                    </span>
+              {upcomingAppointments.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="3"
+                    className="py-4 text-center text-sm text-gray-500">
+                    No upcoming appointments.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                upcomingAppointments.map((appt) => (
+                  <tr
+                    key={appt.id}
+                    className="border-b hover:bg-gray-50 cursor-pointer"
+                    onClick={() => handleAppointmentClick(appt)}>
+                    <td className="py-3">{appt.staff}</td>
+                    <td className="py-3">{appt.date}</td>
+                    <td className="py-3">
+                      <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
+                        {appt.type}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -205,14 +257,15 @@ const PatientHome = () => {
       <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
         <QuickAction title="Profile" icon="👤" link="/patient_profile" />
         <QuickAction title="View Reports" icon="📊" link="/reports" />
-        <QuickAction title="Payment Records" icon="💳" link="/payments" />
+        <QuickAction title="Payment Records" icon="💳" link="/payment_records" />
       </div>
 
+      {/* Appointment Scheduling Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
             <h2 className="text-xl font-semibold mb-4">Schedule Appointment</h2>
-            <form onSubmit={handleSubmit} className="space-y-3">
+       <form onSubmit={handleSubmit} className="space-y-3">
               <input
                 type="text"
                 placeholder="Patient ID"
@@ -290,6 +343,67 @@ const PatientHome = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Modal */}
+      {selectedPayment && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-sm space-y-4">
+            <h2 className="text-lg font-semibold">Complete Payment</h2>
+            <p className="text-gray-600">{selectedPayment.name}</p>
+            <p className="text-gray-600">Amount: ${selectedPayment.amount}</p>
+            <div>
+              <label className="block text-sm mb-1">Payment Method:</label>
+              <select
+                className="w-full p-2 border rounded"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}>
+                <option value="">Select Method</option>
+                <option value="card">Card</option>
+                <option value="ecocash">EcoCash</option>
+              </select>
+            </div>
+            {paymentMethod === "ecocash" && (
+              <input
+                type="text"
+                placeholder="Enter EcoCash number"
+                value={ecoCashNumber}
+                onChange={(e) => setEcoCashNumber(e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+            )}
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setSelectedPayment(null)}
+                className="px-4 py-2 border rounded">
+                Cancel
+              </button>
+              <button
+                onClick={confirmPayment}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Pay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Appointment Details Modal */}
+      {selectedAppointment && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-sm space-y-4">
+            <h2 className="text-lg font-semibold">Appointment Details</h2>
+            <p><strong>Staff:</strong> {selectedAppointment.staff}</p>
+            <p><strong>Date:</strong> {selectedAppointment.date}</p>
+            <p><strong>Type:</strong> {selectedAppointment.type}</p>
+            <p><strong>Description:</strong> {selectedAppointment.description}</p>
+            <button
+              onClick={() => setSelectedAppointment(null)}
+              className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+              Close
+            </button>
           </div>
         </div>
       )}

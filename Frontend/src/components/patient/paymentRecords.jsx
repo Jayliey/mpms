@@ -1,35 +1,46 @@
 import React, { useEffect, useState } from "react";
-import { UserCircle, Calendar, CreditCard, ReceiptText, Pill } from "lucide-react";
+import {
+  UserCircle,
+  Calendar,
+  CreditCard,
+  ReceiptText,
+  Pill,
+} from "lucide-react";
 
 const PaymentHistory = () => {
   const [payments, setPayments] = useState([]);
-  const [patients, setPatients] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch all required data
+  // Get current patient from local storage
+  const storedData = JSON.parse(localStorage.getItem("patient"));
+  const patient = Array.isArray(storedData) ? storedData[0] : storedData;
+
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        const [paymentRes, patientRes, appointmentRes] = await Promise.all([
+        const [paymentRes, appointmentRes] = await Promise.all([
           fetch("http://localhost:3001/payments/"),
-          fetch("http://localhost:3001/patient/"),
-          fetch("http://localhost:3001/appointment/")
+          fetch("http://localhost:3001/appointment/"),
         ]);
 
-        if (!paymentRes.ok || !patientRes.ok || !appointmentRes.ok) {
-          throw new Error("Failed to fetch one or more resources");
+        if (!paymentRes.ok || !appointmentRes.ok) {
+          throw new Error("Failed to fetch payment or appointment data");
         }
 
-        const [paymentData, patientData, appointmentData] = await Promise.all([
+        const [paymentData, appointmentData] = await Promise.all([
           paymentRes.json(),
-          patientRes.json(),
-          appointmentRes.json()
+          appointmentRes.json(),
         ]);
 
-        setPayments(paymentData);
-        setPatients(patientData);
+        // Filter for logged-in patient's payments
+        const filteredPayments = paymentData.filter(
+          (p) => p.patient_id === patient?.patient_id
+        );
+
+        console.log(appointmentData);
+        setPayments(filteredPayments);
         setAppointments(appointmentData);
       } catch (err) {
         setError(err.message);
@@ -39,16 +50,11 @@ const PaymentHistory = () => {
     };
 
     fetchAllData();
-  }, []);
+  }, [patient?.patient_id]);
 
-  const getPatientInfo = (id) => {
-    const p = patients.find((pt) => pt.patient_id === id);
-    return p || null;
-  };
-
+  // FIXED KEY: appointment_id
   const getAppointmentInfo = (id) => {
-    const a = appointments.find((app) => app.appointmentid === id);
-    return a || null;
+    return appointments.find((a) => a.appointment_id === id) || null;
   };
 
   const formatAmount = (amount) => `$${parseFloat(amount).toFixed(2)}`;
@@ -69,14 +75,16 @@ const PaymentHistory = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">💳 Payment History</h2>
+      <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+        <CreditCard className="w-7 h-7 text-blue-500" />
+        Payment History
+      </h2>
 
       {payments.length === 0 ? (
-        <p className="text-gray-600">No payment records found.</p>
+        <p className="text-gray-600">No payment records found for your account.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {payments.map((payment) => {
-            const patient = getPatientInfo(payment.patient_id);
             const appointment = getAppointmentInfo(payment.appointmentid);
             return (
               <div
@@ -88,9 +96,9 @@ const PaymentHistory = () => {
                   <UserCircle className="w-10 h-10 text-blue-500" />
                   <div>
                     <h3 className="text-lg font-semibold">
-                      {patient ? `${patient.name} ${patient.surname}` : "Unknown Patient"}
+                      {`${patient?.name} ${patient?.surname}`}
                     </h3>
-                    <p className="text-gray-500 text-sm">{patient?.phone || "No phone"}</p>
+                    <p className="text-gray-500 text-sm">{patient?.phone}</p>
                   </div>
                 </div>
 
@@ -99,7 +107,7 @@ const PaymentHistory = () => {
                   <Calendar className="w-4 h-4 text-gray-500" />
                   <span>
                     {appointment
-                      ? `${appointment.reason} — ${new Date(appointment.date).toLocaleString()}`
+                      ? appointment.description
                       : "No appointment details"}
                   </span>
                 </div>

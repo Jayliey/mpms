@@ -42,6 +42,38 @@ crudsObj.getAppointments = () => {
   })
 }
 
+crudsObj.getAppointmentByPatientId = patientId => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT * FROM appointments WHERE patient_id = ?',
+      [patientId],
+      (err, results) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(results)
+      }
+    )
+  })
+}
+
+crudsObj.getAppointmentByPatientIdStatus = (patientId, status) => {
+  console.log(status)
+  console.log(patientId)
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT * FROM appointments WHERE patient_id = ? AND status = ?',
+      [patientId, status],
+      (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(results);
+      }
+    );
+  });
+};
+
 crudsObj.getAppointmentById = appointmentId => {
   return new Promise((resolve, reject) => {
     pool.query(
