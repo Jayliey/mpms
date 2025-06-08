@@ -10,6 +10,9 @@ import PatientMedications from './components/patient/medication';
 import PaymentHistory from './components/patient/paymentRecords';
 import NurseDash from './components/nurse/landingViewNurse';
 import DoctorDash from './components/doctor/landingViewDoc';
+import SearchPatientsPage from './components/nurse/searchPatient';
+import SellMedicationPage from './components/nurse/sellPage';
+import PaymentHistoryNurse from './components/nurse/paymentDash';
 
 function App() {
   return (
@@ -22,9 +25,12 @@ function App() {
         <Route path="/nurse_home" element={<NurseDash />} />
         <Route path="/doctor_home" element={<DoctorDash />} />
         <Route path="/patient_profile" element={<PatientProfile />} />
+        <Route path="/search_patient" element={<SearchPatientsPage />} />
         <Route path="/signup_staff" element={<StaffActivation />} />
+        <Route path="/sell" element={<SellMedicationPage />} />
         <Route path="/reports" element={<PatientMedications />} />
         <Route path="/payment_records" element={<PaymentHistory />} />
+        <Route path="/payment_records_dash" element={<PaymentHistoryNurse />} />
         <Route path="/" element={<HomePage />} />
       </Routes>
     </Router>

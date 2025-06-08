@@ -166,6 +166,7 @@ const fetchStaff = async() => {
           if(result.role === "doctor"){
           navigate("/doctor_home"); // Uncomment to navigate to dashboard
           }else{
+              localStorage.setItem("nurse", JSON.stringify(result));
                     navigate("/nurse_home"); // Uncomment to navigate to dashboard
 
           }

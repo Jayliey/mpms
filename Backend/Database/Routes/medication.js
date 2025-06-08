@@ -45,15 +45,29 @@ medicationRouter.get("/:id", async (req, res) => {
   }
 });
 
+medicationRouter.get("/", async (req, res) => {
+  try {
+    const results = await medicationDbOperations.getMedication();
+
+    if (!results || results.length === 0) {
+      return res.status(404).json({ message: "Medication not found" });
+    }
+
+    res.json(results); // Send all records
+  } catch (error) {
+    console.error("Error fetching medication:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 
 // Patch: Update a single column in medication
 medicationRouter.patch("/medupdate/:id", async (req, res) => {
-    
 
   try {
     const medicationId = req.params.id;
     const { column, value } = req.body;
-console.log(medicationId);
+    console.log(medicationId);
     // Validate column name against an allowed list to prevent SQL injection
     const allowedColumns = [
       "assigned_by", "description", "start_date", "end_date",

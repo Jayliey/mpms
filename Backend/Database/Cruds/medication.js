@@ -68,6 +68,20 @@ crudsObj.getMedicationById = (medicationId) => {
   });
 };
 
+crudsObj.getMedication = () => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      `SELECT * FROM medication`,
+      (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(results);
+      }
+    );
+  });
+};
+
 crudsObj.patchMedication = (medicationId, column, value) => {
   return new Promise((resolve, reject) => {
     const query = `UPDATE medication SET \`${column}\` = ? WHERE medication_id = ?`;
