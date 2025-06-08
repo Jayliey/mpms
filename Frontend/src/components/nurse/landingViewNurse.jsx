@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const DashboardPage = () => {
+const NurseDash = () => {
   // Mock data - Replace with API calls
   const [stats, setStats] = useState({
     totalPatients: 0,
@@ -180,4 +180,4 @@ const QuickAction = ({ title, icon, link }) => (
   </Link>
 );
 
-export default DashboardPage;
+export default NurseDash;

@@ -16,13 +16,14 @@ const PatientHome = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [ecoCashNumber, setEcoCashNumber] = useState("");
+  const [loading, setLoading] = useState();
 
   const storedData = JSON.parse(localStorage.getItem("patient"));
   const patient = Array.isArray(storedData) ? storedData[0] : storedData;
 
   const [formData, setFormData] = useState({
-    patient_id: "",
-    staff_id: "",
+    // patient_id: "",
+    // staff_id: "",
     description: "",
     appointment_category: "",
     appointment_state: "",
@@ -31,9 +32,9 @@ const PatientHome = () => {
     status: "Pending",
     date: "",
   });
-
   useEffect(() => {
     const fetchAppointments = async () => {
+      console.log(patient);
       try {
         const response = await fetch(
           `http://localhost:3001/appointment/patient/${patient.patient_id}`,
@@ -44,9 +45,12 @@ const PatientHome = () => {
         );
 
         const result = await response.json();
+        // console.log("appointments", result[0]);
+
         const now = new Date();
 
-        const totalVisits = result.length;
+        const completedVisits = result.filter((a) => a.status === "Completed");
+        const totalVisits = completedVisits.length;
 
         const upcoming = result.filter(
           (a) => new Date(a.date) > now && a.status === "Scheduled"
@@ -73,7 +77,7 @@ const PatientHome = () => {
 
         setPendingPayments(
           pending.map((appt) => ({
-            id: appt.appointment_id,
+            appointment_id: appt.appointment_id,
             name: appt.description || "No description",
             amount: appt.cost,
             dueDate: new Date(appt.date).toISOString().split("T")[0],
@@ -85,22 +89,40 @@ const PatientHome = () => {
       }
     };
 
+    // Call it immediately once
     fetchAppointments();
-  }, []);
+
+    // Then run every 5 seconds
+    const intervalId = setInterval(fetchAppointments, 5000);
+
+    // Clean up when component unmounts
+    return () => clearInterval(intervalId);
+  }, [patient.patient_id]); // include patient.patient_id in dependency array
 
   const handleSubmit = async (e) => {
+    if (
+      // !formData.staff_id ||
+      !formData.date ||
+      !formData.appointment_category
+    ) {
+      return Swal.fire("Error", "Please fill in all required fields.", "error");
+    }
     e.preventDefault();
 
-    const result = await Swal.fire({
-      title: "Pay now or later?",
-      showDenyButton: true,
-      confirmButtonText: "Pay Now",
-      denyButtonText: "Later",
-    });
+    // const result = await Swal.fire({
+    //   title: "Pay now or later?",
+    //   showDenyButton: true,
+    //   confirmButtonText: "Pay Now",
+    //   denyButtonText: "Later",
+    // });
 
-    const paymentStatus = result.isConfirmed ? "Paid" : "Pending";
+    const paymentStatus = "N/A";
 
-    const payload = { ...formData, payment_status: paymentStatus };
+    const payload = {
+      ...formData,
+      patient_id: patient.patient_id,
+      payment_status: paymentStatus,
+    };
 
     try {
       const response = await fetch("http://localhost:3001/appointment/", {
@@ -113,8 +135,8 @@ const PatientHome = () => {
         Swal.fire("Success", "Appointment scheduled successfully.", "success");
         setShowModal(false);
         setFormData({
-          patient_id: "",
-          staff_id: "",
+          // patient_id: "",
+          // staff_id: "",
           description: "",
           appointment_category: "",
           appointment_state: "",
@@ -137,14 +159,157 @@ const PatientHome = () => {
     setEcoCashNumber("");
   };
 
-  const confirmPayment = () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const confirmPayment = async () => {
+    setLoading(true);
+    if (paymentMethod === "card") {
+      return Swal.fire("Info", "Card payments coming soon.", "info");
+    }
+
     if (paymentMethod === "ecocash" && !ecoCashNumber) {
       return Swal.fire("Error", "Please enter your EcoCash number.", "error");
     }
 
-    Swal.fire("Success", "Payment successful.", "success").then(() => {
-      setSelectedPayment(null);
-    });
+    try {
+      const Number = ecoCashNumber;
+      const Amount = selectedPayment.amount;
+
+      const response = await fetch(`http://localhost:3001/payment/pay`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Amount, Number }),
+      });
+
+      const result = await response.json();
+      await delay(5000);
+      verifyPayment(result.pollUrl);
+      setLoading(false);
+    } catch (err) {
+      Swal.fire("Error", "Payment initiation failed.", "error");
+      setLoading(false);
+    }
+  };
+
+  const verifyPayment = async (pollUrl) => {
+    setLoading(true);
+    const startTime = Date.now();
+    const interval = 15000;
+
+    const pollPaymentStatus = async () => {
+      console.log(selectedPayment);
+      try {
+        const response = await fetch(
+          `http://localhost:3001/payment/check-payment-status?pollUrl=${pollUrl}`
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `HTTP error! Status: ${response.status}, Message: ${errorText}`
+          );
+        }
+
+        const result = await response.json();
+
+        if (result.status === 200) {
+          await Update(selectedPayment);
+          clearInterval(polling);
+          setLoading(false);
+        } else if (result.status === 202 || result.status === "sent") {
+          setLoading(true);
+          console.log("Payment pending or sent.");
+        } else if (result.status === 400) {
+          clearInterval(polling);
+          Swal.fire("Error", result.message || "Payment failed.", "error");
+          setLoading(false);
+        }
+      } catch (error) {
+        clearInterval(polling);
+        console.error("Payment verification failed:", error);
+        Swal.fire("Error", "Verification failed.", "error");
+        setLoading(false);
+      }
+    };
+
+    const polling = setInterval(() => {
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime >= 120000) return;
+      pollPaymentStatus();
+    }, interval);
+
+    pollPaymentStatus();
+  };
+
+  const Update = async (data) => {
+    console.log(data);
+    const appointment_id = data.appointment_id;
+    try {
+      const response = await fetch(
+        `http://localhost:3001/appointment/patchy--update/${appointment_id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            payment_status: "Paid",
+          }),
+        }
+      );
+
+      const data = await response.json();
+      await AddPayment(selectedPayment);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update payment status.");
+      }
+
+      console.log("Success:", data.message);
+    } catch (error) {
+      console.error("Error updating payment status:", error.message);
+    }
+  };
+
+  const generateReceiptNumber = () => {
+    const prefix = "RCPT";
+    const timestamp = Date.now().toString().slice(-6); // last 6 digits of timestamp
+    const randomPart = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+    return `${prefix}-${timestamp}-${randomPart}`;
+  };
+
+  const AddPayment = async (data) => {
+    console.log(data);
+    const receipt = generateReceiptNumber();
+    console.log("Generated Receipt Number:", receipt);
+
+    const send = {
+      patient_id: patient.patient_id,
+      appointmentid: data.appointment_id,
+      amount: data.ammount,
+      description: data.name,
+      receiptnumber: receipt,
+      paymenttype: "Ecocash",
+    };
+    try {
+      const response = await fetch(`http://localhost:3001/payments/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(send),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        await AddPayment(data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleAppointmentClick = (appt) => {
@@ -212,6 +377,7 @@ const PatientHome = () => {
           )}
         </div>
 
+        {/* upcomming appointments */}
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">
             Upcoming Appointments
@@ -257,7 +423,11 @@ const PatientHome = () => {
       <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
         <QuickAction title="Profile" icon="👤" link="/patient_profile" />
         <QuickAction title="View Reports" icon="📊" link="/reports" />
-        <QuickAction title="Payment Records" icon="💳" link="/payment_records" />
+        <QuickAction
+          title="Payment Records"
+          icon="💳"
+          link="/payment_records"
+        />
       </div>
 
       {/* Appointment Scheduling Modal */}
@@ -265,8 +435,8 @@ const PatientHome = () => {
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
             <h2 className="text-xl font-semibold mb-4">Schedule Appointment</h2>
-       <form onSubmit={handleSubmit} className="space-y-3">
-              <input
+            <form onSubmit={handleSubmit} className="space-y-3">
+              {/* <input
                 type="text"
                 placeholder="Patient ID"
                 className="w-full p-2 border rounded"
@@ -283,7 +453,7 @@ const PatientHome = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, staff_id: e.target.value })
                 }
-              />
+              /> */}
               <input
                 type="text"
                 placeholder="Description"
@@ -380,11 +550,19 @@ const PatientHome = () => {
                 className="px-4 py-2 border rounded">
                 Cancel
               </button>
-              <button
-                onClick={confirmPayment}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Pay
-              </button>
+              {loading ? (
+                <button
+                  className="px-4 py-2 bg-gray-400 text-white rounded"
+                  disabled>
+                  Processing...
+                </button>
+              ) : (
+                <button
+                  onClick={confirmPayment}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  Pay
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -395,10 +573,18 @@ const PatientHome = () => {
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-sm space-y-4">
             <h2 className="text-lg font-semibold">Appointment Details</h2>
-            <p><strong>Staff:</strong> {selectedAppointment.staff}</p>
-            <p><strong>Date:</strong> {selectedAppointment.date}</p>
-            <p><strong>Type:</strong> {selectedAppointment.type}</p>
-            <p><strong>Description:</strong> {selectedAppointment.description}</p>
+            <p>
+              <strong>Staff:</strong> {selectedAppointment.staff}
+            </p>
+            <p>
+              <strong>Date:</strong> {selectedAppointment.date}
+            </p>
+            <p>
+              <strong>Type:</strong> {selectedAppointment.type}
+            </p>
+            <p>
+              <strong>Description:</strong> {selectedAppointment.description}
+            </p>
             <button
               onClick={() => setSelectedAppointment(null)}
               className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700">

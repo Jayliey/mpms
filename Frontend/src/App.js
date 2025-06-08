@@ -8,6 +8,8 @@ import PatientHome from './components/patient/landingView';
 import PatientProfile from './components/patient/patientDetails';
 import PatientMedications from './components/patient/medication';
 import PaymentHistory from './components/patient/paymentRecords';
+import NurseDash from './components/nurse/landingViewNurse';
+import DoctorDash from './components/doctor/landingViewDoc';
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/patient_home" element={<PatientHome />} />
+        <Route path="/nurse_home" element={<NurseDash />} />
+        <Route path="/doctor_home" element={<DoctorDash />} />
         <Route path="/patient_profile" element={<PatientProfile />} />
         <Route path="/signup_staff" element={<StaffActivation />} />
         <Route path="/reports" element={<PatientMedications />} />

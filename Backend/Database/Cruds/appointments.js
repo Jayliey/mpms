@@ -123,6 +123,34 @@ crudsObj.updateAppointment = (appointmentId, updatedValues) => {
   });
 };
 
+
+
+crudsObj.patchPayment = (appointmentId, updatedFields) => {
+  return new Promise((resolve, reject) => {
+    const fields = Object.keys(updatedFields);
+    const values = Object.values(updatedFields);
+
+    if (fields.length === 0) {
+      return resolve({ status: "400", message: "No fields to update" });
+    }
+
+    const setClause = fields.map(field => `${field} = ?`).join(", ");
+
+    const sql = `UPDATE appointments SET ${setClause} WHERE appointment_id = ?`;
+
+    pool.query(sql, [...values, appointmentId], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve({ status: "200", message: "Patch update successful" });
+    });
+  });
+};
+
+
+
+
+
 crudsObj.deleteAppointment = id => {
   return new Promise((resolve, reject) => {
     pool.query(

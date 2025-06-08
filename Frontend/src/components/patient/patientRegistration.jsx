@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { FaUser, FaSun, FaMoon } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export default function PatientRegistration() {
   const {
@@ -17,19 +19,49 @@ export default function PatientRegistration() {
   const [darkMode, setDarkMode] = useState(false);
   const [success, setSuccess] = useState(false);
   const maritalStatus = watch("marital_status");
+  const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
+      const calculateAge = (dob) => {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        return age;
+      };
+
+      const age = calculateAge(data.dob);
+      const submissionData = { ...data, age };
+
       const response = await axios.post(
-        "http://localhost:5000/api/patients",
-        data
+        "http://localhost:3001/patient/",
+        submissionData
       );
-      if (response.data.status === "success") {
+
+      console.log("Admission", response);
+
+      if (response.data.status == 200) {
         setSuccess(true);
         reset();
+
+        await Swal.fire({
+          title: "Success!",
+          text: "You have registered successfully!",
+          icon: "success",
+          confirmButtonText: "Proceed",
+          timer: 2000,
+          timerProgressBar: true,
+        });
+
+        // Navigate after delay
+        navigate("/login");
       }
     } catch (err) {
-      alert("Registration failed. Please try again.");
+      Swal.fire("Error", "Registration failed. Please try again.", "error");
       setSuccess(false);
     }
   };
@@ -90,15 +122,45 @@ export default function PatientRegistration() {
             label="Address"
             placeholder="Enter residential address"
             error={errors.address}
-            {...register("address", { required: "Address is required" })}
+            {...register("address1", { required: "Address is required" })}
           />
           <Input
             label="Phone Number"
             type="tel"
             placeholder="Enter 10-digit phone number"
-            error={errors.contact}
-            {...register("contact", {
+            error={errors.phone}
+            {...register("phone", {
               required: "Contact number is required",
+              pattern: {
+                value: /^[0-9]{10}$/,
+                message: "Invalid phone number",
+              },
+            })}
+          />
+
+                    <Input
+            label="Next_of_Kin's Name"
+            placeholder="Enter the name of your Next of Kin"
+            error={errors.nok_name}
+            {...register("nok_name", {
+              required: "Next of Kin's name is required",
+            })}
+          />
+          <Input
+            label="Next_of_Kin's Surname"
+            placeholder="Enter the surname of your Next of Kin"
+            error={errors.nok_surname}
+            {...register("nok_surname", {
+              required: "Next of Kin's surname is required",
+            })}
+          />
+          <Input
+            label="Next_of_Kin's Phone Number"
+            type="tel"
+            placeholder="Enter 10-digit phone number"
+            error={errors.nok_phone}
+            {...register("nok_phone", {
+              required: "Next of Kin's phone number is required",
               pattern: {
                 value: /^[0-9]{10}$/,
                 message: "Invalid phone number",
@@ -112,8 +174,8 @@ export default function PatientRegistration() {
             {...register("gender", { required: "Gender is required" })}
             options={[
               { value: "", label: "Select gender" },
-              { value: "m", label: "Male" },
-              { value: "f", label: "Female" },
+              { value: "male", label: "Male" },
+              { value: "female", label: "Female" },
             ]}
           />
 
@@ -159,11 +221,30 @@ export default function PatientRegistration() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`w-full py-2 rounded-lg font-semibold transition-all ${
+            className={`w-full py-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
               isSubmitting
                 ? "bg-blue-300 text-white cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}>
+            {isSubmitting && (
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+            )}
             {isSubmitting ? "Registering..." : "Register"}
           </button>
 

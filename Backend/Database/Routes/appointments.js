@@ -109,6 +109,23 @@ appointmentRouter.get('/:id', async (req, res, next) => {
   }
 })
 
+appointmentRouter.patch("/patchy--update/:id", async (req, res) => {
+  try {
+    const appointmentId = req.params.id;
+    const fieldsToUpdate = req.body;
+
+    if (Object.keys(fieldsToUpdate).length === 0) {
+      return res.status(400).json({ message: "No fields provided to update" });
+    }
+
+    const results = await appointmentsDbOperations.patchPayment(appointmentId, fieldsToUpdate);
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
 appointmentRouter.put('/:id', async (req, res, next) => {
   try {
     const appointmentId = req.params.id

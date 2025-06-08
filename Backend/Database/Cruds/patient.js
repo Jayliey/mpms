@@ -9,12 +9,12 @@ crudsObj.postPatient = (patient) => {
     console.log("honai patient:", patient);
     pool.query(
       `INSERT INTO patient (
-        name, surname, age, dob, gender, id_number, allergies, hiv_status, phone, 
+        name, surname, age, dob, gender, id_number, phone, 
         address1, address2, email, 
         nok_name, nok_surname, nok_phone, 
         marital_status, spouse_name, spouse_surname, spouse_phone, spouse_email, 
         time_signed
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         patient.name,
         patient.surname,
@@ -22,8 +22,6 @@ crudsObj.postPatient = (patient) => {
         patient.dob,
         patient.gender,
         patient.id_number,
-        patient.allergies,
-        patient.hiv_status,
         patient.phone,
         patient.address1,
         patient.address2,

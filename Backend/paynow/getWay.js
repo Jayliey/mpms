@@ -12,6 +12,9 @@ paynow.resultUrl = "http://localhost:5000/gateways/paynow/update";
 
 getWayRoute.post('/pay', async (req, res) => {
   const mobileNumber = req.body.Number ;
+  const value = req.body.Amount;
+
+  console.log("getway value", value);
 
   if (!mobileNumber) {
     return res.status(400).json({ error: 'Mobile number is required.' });
@@ -20,7 +23,7 @@ getWayRoute.post('/pay', async (req, res) => {
   try {
     let payment = paynow.createPayment("Invoice 37", "tawandachapaguta@gmail.com");
 
-    payment.add("Project", 0.01);
+    payment.add("Project", value);
    
 
     const response = await paynow.sendMobile(payment, mobileNumber, 'ecocash');

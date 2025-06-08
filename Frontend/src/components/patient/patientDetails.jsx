@@ -75,6 +75,26 @@ const PatientProfile = () => {
     }
   };
 
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, logout",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.clear();
+        Swal.fire("Logged Out", "You have been logged out.", "success").then(
+          () => {
+            window.location.href = "/"; // or "/login" if you have a dedicated login route
+          }
+        );
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-50 py-12 px-4 md:px-16">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-8 space-y-6">
@@ -85,7 +105,8 @@ const PatientProfile = () => {
           <div className="space-x-3">
             <button
               onClick={handleUpdateProfile}
-              className="px-5 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-white font-medium shadow">
+              className="px-5 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-white font-medium shadow"
+            >
               ✏️ Update Profile
             </button>
             <button
@@ -94,8 +115,15 @@ const PatientProfile = () => {
                 patient.status === "Active"
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-green-600 hover:bg-green-700"
-              }`}>
+              }`}
+            >
               {patient.status === "Active" ? "Deactivate" : "Activate"}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-5 py-2 rounded-xl bg-gray-700 hover:bg-gray-800 text-white font-medium shadow"
+            >
+              🚪 Logout
             </button>
           </div>
         </div>
@@ -128,7 +156,8 @@ const PatientProfile = () => {
                     patient.status === "Active"
                       ? "text-green-600"
                       : "text-red-500"
-                  }`}>
+                  }`}
+                >
                   {patient.status}
                 </span>
               </li>
@@ -222,7 +251,8 @@ const PatientProfile = () => {
                 .map((med) => (
                   <li
                     key={med.medication_id}
-                    className="p-4 bg-green-100 border border-green-300 rounded-lg shadow-sm">
+                    className="p-4 bg-green-100 border border-green-300 rounded-lg shadow-sm"
+                  >
                     <div className="font-semibold text-green-800">
                       {med.description}
                     </div>

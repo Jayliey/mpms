@@ -112,14 +112,13 @@ const handleSubmit = async (e) => {
   // Simulate a login process
   setTimeout(() => {
     setLoading(false);
-    alert("Logged in! (demo)");
+    alert("You are Logged in");
   }, 1200);
 };
 
 
 const fetchPatient = async () => {
   try {
-    console.log("Logging in with:", userId);
     const response = await fetch(`${API}/patient/login/${userId}`, {
       method: "GET",
       headers: {
@@ -159,12 +158,17 @@ const fetchStaff = async() => {
         });
 
         const result = await response.json();
-
+ console.log(result);
         if (response.ok && result) {
           // Successful login logic here
           await Swal.fire('Success!', 'You have logged in successfully!', 'success');
           // onLogin(); // Call your login function to update state
-          navigate("/home"); // Uncomment to navigate to dashboard
+          if(result.role === "doctor"){
+          navigate("/doctor_home"); // Uncomment to navigate to dashboard
+          }else{
+                    navigate("/nurse_home"); // Uncomment to navigate to dashboard
+
+          }
         } else {
           await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
         }
