@@ -1,10 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaUserNurse, FaUserMd, FaUserInjured, FaMoon, FaSun } from "react-icons/fa";
-import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom';
+import {
+  FaUserNurse,
+  FaUserMd,
+  FaUserInjured,
+  FaMoon,
+  FaSun,
+} from "react-icons/fa";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 import { API } from "../services/api";
-
 
 const glass =
   "backdrop-blur-lg bg-white/60 dark:bg-slate-900/70 shadow-2xl ring-1 ring-neutral-200/50 dark:ring-slate-800/80";
@@ -19,12 +24,15 @@ function AnimatedBG({ darkMode }) {
   return (
     <svg
       className="fixed inset-0 w-full h-full z-0 pointer-events-none"
-      aria-hidden="true"
-    >
+      aria-hidden="true">
       <defs>
         <linearGradient id="a" x1="0" x2="1" y1="0" y2="1">
           <stop stopColor="#3b82f6" stopOpacity={darkMode ? "0.18" : "0.11"} />
-          <stop offset="1" stopColor="#06b6d4" stopOpacity={darkMode ? "0.14" : "0.09"} />
+          <stop
+            offset="1"
+            stopColor="#06b6d4"
+            stopOpacity={darkMode ? "0.14" : "0.09"}
+          />
         </linearGradient>
         <radialGradient id="b">
           <stop stopColor="#818CF8" stopOpacity={darkMode ? "0.13" : "0.09"} />
@@ -44,7 +52,12 @@ function AnimatedBG({ darkMode }) {
           x: [0, 10, 0],
           y: [0, 10, 0],
         }}
-        transition={{ duration: 11, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+        transition={{
+          duration: 11,
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        }}
       />
       <motion.ellipse
         cx="80%"
@@ -59,7 +72,12 @@ function AnimatedBG({ darkMode }) {
           x: [0, -12, 0],
           y: [0, -6, 0],
         }}
-        transition={{ duration: 14, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+        transition={{
+          duration: 14,
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        }}
       />
     </svg>
   );
@@ -73,7 +91,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [darkMode, setDarkMode] = useState(false);
-  const navigate =useNavigate();
+  const navigate = useNavigate();
 
   const firstInputRef = useRef();
   useEffect(() => {
@@ -88,101 +106,117 @@ export default function Login() {
     setPassword("");
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  // Validate inputs based on role
-  if (role === "patient") {
-    if (!userId) {
-      setError("Please enter your ID number.");
-      return;
-    }
-    await fetchPatient();
-  } else if (role === "nurse" || role === "doctor") {
-    if (!email || !password) {
-      setError("Please fill in all fields.");
-      return;
-    }
-    await fetchStaff();
-  }
-
-  setLoading(true);
-  
-  // Simulate a login process
-  setTimeout(() => {
-    setLoading(false);
-    alert("You are Logged in");
-  }, 1200);
-};
-
-
-const fetchPatient = async () => {
-  try {
-    const response = await fetch(`${API}/patient/login/${userId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const result = await response.json();
-
-    if (response.ok && result) {
-      console.log("patient", result);
-      localStorage.setItem("patient", JSON.stringify(result));
-
-      await Swal.fire('Success!', 'You have logged in successfully!', 'success');
-
-      // onLogin(); // Call your login function to update state
-      navigate("/patient_home");
-    } else {
-      await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
-    }
-  } catch (error) {
-    console.log("Error", error);
-    await Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
-  }
-};
-
-
-
-const fetchStaff = async() => {
-         try {
-        console.log("Logging in with:", email, password);
-        const response = await fetch(`${API}/user/login/${email}/${password}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        const result = await response.json();
- console.log(result);
-        if (response.ok && result) {
-          // Successful login logic here
-          await Swal.fire('Success!', 'You have logged in successfully!', 'success');
-          // onLogin(); // Call your login function to update state
-          if(result.role === "doctor"){
-          navigate("/doctor_home"); // Uncomment to navigate to dashboard
-          }else{
-              localStorage.setItem("nurse", JSON.stringify(result));
-                    navigate("/nurse_home"); // Uncomment to navigate to dashboard
-
-          }
-        } else {
-          await Swal.fire('Error!', result.message || 'Login failed. Please try again.', 'error');
-        }
-      } catch (error) {
-        console.log("Error", error);
-        await Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
+    // Validate inputs based on role
+    if (role === "patient") {
+      if (!userId) {
+        setError("Please enter your ID number.");
+        return;
       }
-}
+      await fetchPatient();
+    } else if (role === "nurse" || role === "doctor") {
+      if (!email || !password) {
+        setError("Please fill in all fields.");
+        return;
+      }
+      await fetchStaff();
+    }
 
+    setLoading(true);
 
+    // Simulate a login process
+    setTimeout(() => {
+      setLoading(false);
+      alert("You are Logged in");
+    }, 1200);
+  };
 
+  const fetchPatient = async () => {
+    try {
+      const response = await fetch(`${API}/patient/login/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
+      const result = await response.json();
 
+      if (response.ok && result) {
+        console.log("patient", result);
+        localStorage.setItem("patient", JSON.stringify(result));
+
+        await Swal.fire(
+          "Success!",
+          "You have logged in successfully!",
+          "success"
+        );
+
+        // onLogin(); // Call your login function to update state
+        navigate("/patient_home");
+      } else {
+        await Swal.fire(
+          "Error!",
+          result.message || "Login failed. Please try again.",
+          "error"
+        );
+      }
+    } catch (error) {
+      console.log("Error", error);
+      await Swal.fire(
+        "Error!",
+        "An unexpected error occurred. Please try again.",
+        "error"
+      );
+    }
+  };
+
+  const fetchStaff = async () => {
+    try {
+      console.log("Logging in with:", email, password);
+      const response = await fetch(`${API}/user/login/${email}/${password}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+      console.log(result);
+      if (response.ok && result) {
+        // Successful login logic here
+        await Swal.fire(
+          "Success!",
+          "You have logged in successfully!",
+          "success"
+        );
+        // onLogin(); // Call your login function to update state
+        if (result.role === "doctor") {
+          localStorage.setItem("doctor", JSON.stringify(result));
+          navigate("/doctor_home"); // Uncomment to navigate to dashboard
+        } else {
+          localStorage.setItem("nurse", JSON.stringify(result));
+          navigate("/nurse_home"); // Uncomment to navigate to dashboard
+        }
+      } else {
+        await Swal.fire(
+          "Error!",
+          result.message || "Login failed. Please try again.",
+          "error"
+        );
+      }
+    } catch (error) {
+      console.log("Error", error);
+      await Swal.fire(
+        "Error!",
+        "An unexpected error occurred. Please try again.",
+        "error"
+      );
+    }
+  };
 
   const roleOptions = [
     {
@@ -212,8 +246,7 @@ const fetchStaff = async() => {
       style={{
         fontFamily:
           "'Inter', 'Roboto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
-      }}
-    >
+      }}>
       <AnimatedBG darkMode={darkMode} />
 
       <main className="relative w-full z-10 max-w-md">
@@ -231,15 +264,13 @@ const fetchStaff = async() => {
             transition={{ type: "spring", duration: 0.7 }}
             role="dialog"
             aria-modal="true"
-            aria-label="Login form"
-          >
+            aria-label="Login form">
             {/* Theme Toggle */}
             <button
               type="button"
               onClick={() => setDarkMode((d) => !d)}
               aria-label={`Switch to ${darkMode ? "light" : "dark"} mode`}
-              className="absolute top-4 right-4 p-2 rounded-xl shadow-sm bg-white/70 dark:bg-slate-800/80 hover:bg-white/90 dark:hover:bg-slate-700/80 transition"
-            >
+              className="absolute top-4 right-4 p-2 rounded-xl shadow-sm bg-white/70 dark:bg-slate-800/80 hover:bg-white/90 dark:hover:bg-slate-700/80 transition">
               {darkMode ? (
                 <FaSun className="w-6 h-6 text-yellow-400" />
               ) : (
@@ -251,9 +282,14 @@ const fetchStaff = async() => {
               Welcome Back
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6"
+              autoComplete="off">
               {/* Role Selector */}
-              <fieldset className="flex justify-center gap-4 mb-3" aria-label="Select Role">
+              <fieldset
+                className="flex justify-center gap-4 mb-3"
+                aria-label="Select Role">
                 {roleOptions.map((opt) => (
                   <label
                     key={opt.value}
@@ -262,8 +298,7 @@ const fetchStaff = async() => {
                         role === opt.value
                           ? "border-blue-500 dark:border-teal-400 bg-blue-50/50 dark:bg-slate-800/60 shadow-lg"
                           : "border-transparent bg-transparent hover:bg-blue-100/40 dark:hover:bg-slate-700/60"
-                      }`}
-                  >
+                      }`}>
                     <input
                       type="radio"
                       value={opt.value}
@@ -271,7 +306,10 @@ const fetchStaff = async() => {
                       onChange={handleRoleChange}
                       className="sr-only"
                     />
-                    <span className={`text-2xl ${role === opt.value ? "scale-110" : "opacity-70"}`}>
+                    <span
+                      className={`text-2xl ${
+                        role === opt.value ? "scale-110" : "opacity-70"
+                      }`}>
                       {opt.icon}
                     </span>
                     <span
@@ -279,8 +317,7 @@ const fetchStaff = async() => {
                         role === opt.value
                           ? "text-blue-600 dark:text-teal-300"
                           : "text-neutral-500 dark:text-neutral-400"
-                      }`}
-                    >
+                      }`}>
                       {opt.label}
                     </span>
                   </label>
@@ -295,8 +332,7 @@ const fetchStaff = async() => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4 }}
-                  >
+                    transition={{ duration: 0.4 }}>
                     <div className="relative mb-4">
                       <input
                         id="userId"
@@ -320,8 +356,7 @@ const fetchStaff = async() => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4 }}
-                  >
+                    transition={{ duration: 0.4 }}>
                     <div className="relative mb-4">
                       <input
                         id="email"
@@ -365,8 +400,7 @@ const fetchStaff = async() => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
-                    role="alert"
-                  >
+                    role="alert">
                     {error}
                   </motion.div>
                 )}
@@ -381,8 +415,7 @@ const fetchStaff = async() => {
                     ? "bg-blue-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-500 to-teal-400 dark:from-teal-600 dark:to-blue-500 text-white hover:scale-105 focus:scale-105 focus:ring-2 focus:ring-blue-400 dark:focus:ring-teal-300"
                 }`}
-                whileTap={{ scale: 0.97 }}
-              >
+                whileTap={{ scale: 0.97 }}>
                 {loading ? "Signing In..." : "Sign In"}
               </motion.button>
 
@@ -393,8 +426,7 @@ const fetchStaff = async() => {
                 </span>
                 <a
                   href="/signup"
-                  className="font-medium text-blue-600 dark:text-teal-300 hover:underline"
-                >
+                  className="font-medium text-blue-600 dark:text-teal-300 hover:underline">
                   Sign up
                 </a>
               </div>
@@ -404,8 +436,7 @@ const fetchStaff = async() => {
                 </span>
                 <a
                   href="/signup_staff"
-                  className="font-medium text-blue-600 dark:text-teal-300 hover:underline"
-                >
+                  className="font-medium text-blue-600 dark:text-teal-300 hover:underline">
                   Activate
                 </a>
               </div>

@@ -14,12 +14,16 @@ import SearchPatientsPage from './components/nurse/searchPatient';
 import SellMedicationPage from './components/nurse/sellPage';
 import PaymentHistoryNurse from './components/nurse/paymentDash';
 import Reports from './components/nurse/myReports';
+import PatientSignUp from './pages/patientSignUp';
+import ReportsDoc from './components/doctor/myDocReports';
+import SearchPatients from './components/doctor/searchPatientDoc';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/signup" element={<PatientRegistration />} />
+        <Route path="/signup_two" element={<PatientSignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/patient_home" element={<PatientHome />} />
@@ -27,12 +31,14 @@ function App() {
         <Route path="/doctor_home" element={<DoctorDash />} />
         <Route path="/patient_profile" element={<PatientProfile />} />
         <Route path="/search_patient" element={<SearchPatientsPage />} />
+        <Route path="/search_patient_doc" element={<SearchPatients />} />
         <Route path="/signup_staff" element={<StaffActivation />} />
         <Route path="/sell" element={<SellMedicationPage />} />
         <Route path="/reports" element={<PatientMedications />} />
         <Route path="/reports_nurse" element={<Reports />} />
+        <Route path="/reports_doctor" element={<ReportsDoc />} />
         <Route path="/payment_records" element={<PaymentHistory />} />
-        <Route path="/payment_records_dash" element={<PaymentHistoryNurse />} />
+        <Route path="/payment_records_dash" element={<PaymentHistoryNurse />}/>
         <Route path="/" element={<HomePage />} />
       </Routes>
     </Router>

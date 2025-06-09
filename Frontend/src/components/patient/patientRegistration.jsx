@@ -42,7 +42,6 @@ export default function PatientRegistration() {
         submissionData
       );
 
-      console.log("Admission", response);
 
       if (response.data.status == 200) {
         setSuccess(true);
