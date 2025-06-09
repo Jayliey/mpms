@@ -144,6 +144,8 @@ const NurseDash = () => {
           body: JSON.stringify({
             status: "Scheduled",
             staff_id,
+            payment_status: "Pending",
+            cost: selectedRequest.cost,
           }),
         }
       );
@@ -278,7 +280,7 @@ const NurseDash = () => {
       {/* Quick Actions */}
       <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
         <QuickAction title="Search Patient" icon={<FaSearch />} link="/search_patient" />
-        <QuickAction title="View Reports" icon={<FaChartBar />} link="/reports" />
+        <QuickAction title="View Reports" icon={<FaChartBar />} link="/reports_nurse" />
         <QuickAction
           title="Payment Records"
           icon={<FaCreditCard />}
@@ -288,62 +290,82 @@ const NurseDash = () => {
       </div>
 
       {/* Modal */}
-      {modalOpen && selectedRequest && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 w-96 shadow-lg relative">
-            <h3 className="text-xl font-semibold mb-4">Request Details</h3>
-            <p>
-              <strong>Patient ID:</strong> {selectedRequest.patient_id}
-            </p>
-            <p>
-              <strong>Name:</strong>{" "}
-              {selectedPatient
-                ? `${selectedPatient.name || "N/A"} ${
-                    selectedPatient.surname || ""
-                  }`
-                : "Loading..."}
-            </p>
-            <p>
-              <strong>Age:</strong>{" "}
-              {selectedPatient
-                ? calculateAge(selectedPatient.dob)
-                : "Loading..."}
-            </p>
-            <p>
-              <strong>Category:</strong> {selectedRequest.appointment_category}
-            </p>
-            <p>
-              <strong>Description:</strong> {selectedRequest.description}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedRequest.status}
-            </p>
+{modalOpen && selectedRequest && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white rounded-lg p-6 w-96 shadow-lg relative">
+      <h3 className="text-xl font-semibold mb-4">Request Details</h3>
+      <p>
+        <strong>Patient ID:</strong> {selectedRequest.patient_id}
+      </p>
+      <p>
+        <strong>Name:</strong>{" "}
+        {selectedPatient
+          ? `${selectedPatient.name || "N/A"} ${
+              selectedPatient.surname || ""
+            }`
+          : "Loading..."}
+      </p>
+      <p>
+        <strong>Age:</strong>{" "}
+        {selectedPatient
+          ? calculateAge(selectedPatient.dob)
+          : "Loading..."}
+      </p>
+      <p>
+        <strong>Category:</strong> {selectedRequest.appointment_category}
+      </p>
+      <p>
+        <strong>Description:</strong> {selectedRequest.description}
+      </p>
+      <p>
+        <strong>Status:</strong> {selectedRequest.status}
+      </p>
 
-            <div className="mt-6 flex justify-end space-x-4">
-              <button
-                onClick={handleDecline}
-                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
-              >
-                Decline
-              </button>
-              <button
-                onClick={handleAccept}
-                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-              >
-                Accept
-              </button>
-            </div>
+      {/* Cost Input */}
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Appointment Cost ($)
+        </label>
+        <input
+          type="number"
+          value={selectedRequest.cost || ""}
+          onChange={(e) =>
+            setSelectedRequest((prev) => ({
+              ...prev,
+              cost: parseFloat(e.target.value),
+            }))
+          }
+          min="0"
+          className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
 
-            <button
-              onClick={closeModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold"
-              aria-label="Close modal"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="mt-6 flex justify-end space-x-4">
+        <button
+          onClick={handleDecline}
+          className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+        >
+          Decline
+        </button>
+        <button
+          onClick={handleAccept}
+          className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+        >
+          Accept
+        </button>
+      </div>
+
+      <button
+        onClick={closeModal}
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold"
+        aria-label="Close modal"
+      >
+        ×
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

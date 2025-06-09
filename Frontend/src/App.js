@@ -13,6 +13,7 @@ import DoctorDash from './components/doctor/landingViewDoc';
 import SearchPatientsPage from './components/nurse/searchPatient';
 import SellMedicationPage from './components/nurse/sellPage';
 import PaymentHistoryNurse from './components/nurse/paymentDash';
+import Reports from './components/nurse/myReports';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/signup_staff" element={<StaffActivation />} />
         <Route path="/sell" element={<SellMedicationPage />} />
         <Route path="/reports" element={<PatientMedications />} />
+        <Route path="/reports_nurse" element={<Reports />} />
         <Route path="/payment_records" element={<PaymentHistory />} />
         <Route path="/payment_records_dash" element={<PaymentHistoryNurse />} />
         <Route path="/" element={<HomePage />} />
