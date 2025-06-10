@@ -17,6 +17,7 @@ import Reports from './components/nurse/myReports';
 import PatientSignUp from './pages/patientSignUp';
 import ReportsDoc from './components/doctor/myDocReports';
 import SearchPatients from './components/doctor/searchPatientDoc';
+import PrescriptionPage from './components/doctor/PrescriptionPage';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/patient_home" element={<PatientHome />} />
         <Route path="/nurse_home" element={<NurseDash />} />
         <Route path="/doctor_home" element={<DoctorDash />} />
+        <Route path="/doctor_prescribe" element={<PrescriptionPage />} />
         <Route path="/patient_profile" element={<PatientProfile />} />
         <Route path="/search_patient" element={<SearchPatientsPage />} />
         <Route path="/search_patient_doc" element={<SearchPatients />} />

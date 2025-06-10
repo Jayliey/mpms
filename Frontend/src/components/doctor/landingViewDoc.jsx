@@ -136,7 +136,7 @@ const DoctorDash = () => {
             + New Patient
           </Link>
           <Link
-            to="/prescriptions/new"
+            to="/doctor_prescribe"
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             + Prescribe Medicine
           </Link>

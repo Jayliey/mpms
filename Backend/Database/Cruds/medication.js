@@ -8,7 +8,8 @@ crudsObj.postMedication = (medication) => {
   return new Promise((resolve, reject) => {
     pool.query(
       `INSERT INTO medication (
-        patient_id, 
+        patient_id,
+        staff_id, 
         assigned_by, 
         description, 
         start_date, 
@@ -16,9 +17,10 @@ crudsObj.postMedication = (medication) => {
         consumption_description, 
         consumption_status,
         time_prescribed
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp())`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, current_timestamp())`,
       [
         medication.patient_id,
+        medication.staff_id,
         medication.assigned_by,
         medication.description,
         medication.start_date,
