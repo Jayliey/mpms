@@ -40,6 +40,7 @@ export default function PrescriptionPage() {
       const staffData = localStorage.getItem("doctor");
       if (!staffData) throw new Error("No staff ID found in localStorage");
     const staffAll = JSON.parse(staffData);
+     console.log("res", staffAll)
 
     // Extract the staff_id
     const staffId = staffAll.staff_id;

@@ -190,7 +190,7 @@ const NurseDash = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-blue-900">Maternity Dashboard</h1>
         <Link
-          to="/patients/new"
+          to="/signup_two"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
           + New Patient

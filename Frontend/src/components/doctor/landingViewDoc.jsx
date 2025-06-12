@@ -14,6 +14,8 @@ const DoctorDash = () => {
   const [pendingAppointments, setPendingAppointments] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [isEditingAppointment, setIsEditingAppointment] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,26 +120,39 @@ const DoctorDash = () => {
     // Add API call to accept the appointment here
   };
 
-  const handleEditAppointment = (appointmentId) => {
-    console.log("Edit appointment:", appointmentId);
-    // Add logic to open edit modal or navigate to edit page
+  const handleEditAppointment = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsEditingAppointment(true);
+    setEditFormData({
+      description: appointment.description,
+      status: appointment.status,
+      payment_status: appointment.payment_status,
+      date: appointment.date.split("T")[0],
+    });
+  };
+
+  const handleUpdateAppointment = () => {
+    console.log("Updated appointment:", editFormData);
+    // Add API call to update the appointment here
+    setIsEditingAppointment(false);
+    setSelectedAppointment(null);
   };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-900">
-          Maternity Dashboard
-        </h1>
+        <h1 className="text-3xl font-bold text-blue-900">Maternity Dashboard</h1>
         <div className="flex space-x-4">
           <Link
             to="/signup_two"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
             + New Patient
           </Link>
           <Link
             to="/doctor_prescribe"
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
             + Prescribe Medicine
           </Link>
         </div>
@@ -156,12 +171,6 @@ const DoctorDash = () => {
           icon="🗕"
           color="bg-green-100"
         />
-        {/* <StatCard
-          title="Recent Payments"
-          value={stats.recentPayments}
-          icon="💵"
-          color="bg-purple-100"
-        /> */}
         <StatCard
           title="Monthly Admissions"
           value={stats.monthlyAdmissions}
@@ -180,7 +189,8 @@ const DoctorDash = () => {
               <div
                 key={patient.id}
                 onClick={() => setSelectedPatient(patient)}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 rounded cursor-pointer">
+                className="flex items-center justify-between p-3 hover:bg-gray-50 rounded cursor-pointer"
+              >
                 <div>
                   <h3 className="font-medium">{patient.name}</h3>
                   <p className="text-sm text-gray-500">
@@ -213,9 +223,8 @@ const DoctorDash = () => {
                   <tr
                     key={appointment.id}
                     className="border-b hover:bg-gray-50 cursor-pointer"
-                    onClick={() =>
-                      setSelectedAppointment(appointment.fullData)
-                    }>
+                    onClick={() => handleEditAppointment(appointment.fullData)}
+                  >
                     <td className="py-3">{appointment.patient}</td>
                     <td className="py-3">{appointment.date}</td>
                     <td className="py-3">
@@ -278,7 +287,7 @@ const DoctorDash = () => {
         <QuickAction
           title="Schedule Appointment"
           icon="➕"
-          link="/appointments/new"
+          link="/create_appointment_doc"
         />
         <QuickAction title="View Reports" icon="📊" link="/reports_doctor" />
         <QuickAction
@@ -293,34 +302,41 @@ const DoctorDash = () => {
         />
       </div>
 
-      {selectedPatient && (
-        <Modal onClose={() => setSelectedPatient(null)}>
-          <h2 className="text-xl font-semibold mb-4">Patient Details</h2>
-          <p>Name: {selectedPatient.name}</p>
-          <p>Age: {selectedPatient.age}</p>
-          <p>Gender: {selectedPatient.gender}</p>
-          <p>Phone: {selectedPatient.phone}</p>
-          <p>Address: {selectedPatient.address}</p>
-          <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
-            Update
-          </button>
-        </Modal>
-      )}
-
-      {selectedAppointment && (
-        <Modal onClose={() => setSelectedAppointment(null)}>
-          <h2 className="text-xl font-semibold mb-4">Appointment Details</h2>
-          <p>ID: {selectedAppointment.appointment_id}</p>
-          <p>Description: {selectedAppointment.description}</p>
-          <p>Date: {new Date(selectedAppointment.date).toLocaleString()}</p>
-          <p>Payment Status: {selectedAppointment.payment_status}</p>
-          <p>Status: {selectedAppointment.status}</p>
-          <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
-            Update
-          </button>
-        </Modal>
-      )}
-    </div>
+<div className="bg-white p-6 rounded-xl shadow-sm">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+            Upcoming Appointments
+          </h2>
+          <div className="max-h-64 overflow-y-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-left text-gray-500 border-b">
+                  <th className="pb-2">Patient</th>
+                  <th className="pb-2">Date & Time</th>
+                  <th className="pb-2">Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {upcomingAppointments.map((appointment) => (
+                  <tr
+                    key={appointment.id}
+                    className="border-b hover:bg-gray-50 cursor-pointer"
+                    onClick={() => handleEditAppointment(appointment.fullData)}
+                  >
+                    <td className="py-3">{appointment.patient}</td>
+                    <td className="py-3">{appointment.date}</td>
+                    <td className="py-3">
+                      <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
+                        {appointment.type}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    // </div>
   );
 };
 
